@@ -1,0 +1,17 @@
+megs: 32
+romimage: file=/usr/share/bochs/BIOS-bochs-latest, address=0xfffe0000
+vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
+vga: extension=vbe, update_freq=60
+
+cpu: count=4, ips=10000000
+
+ata0-master: type=cdrom, path="levi.iso", status=inserted
+boot: cdrom
+
+com1: enabled=1, mode=file, dev=/dev/stdout
+
+#ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+log: out.log
+
+
+#display_library: x, options="gui_debug"
