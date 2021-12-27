@@ -9,6 +9,8 @@ TARGET=$(BUILDDIR)/levi
 OBJ= kmain.c.o \
 	panic.c.o \
 	boot/stivale2.c.o \
+	utils/string.c.o \
+	utils/stdio.c.o \
 	arch/x86_64/arch.c.o
 
 OBJECTS= $(addprefix $(BUILDDIR)/, $(OBJ))

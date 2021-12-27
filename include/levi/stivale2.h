@@ -1,6 +1,8 @@
 #ifndef STIVALE2_HEADER
 #define STIVALE2_HEADER
 
+#include <stdarg.h>
+
 #include "levi/types.h"
 
 // Anchor for non ELF kernels
@@ -308,5 +310,12 @@ struct stivale2_struct_vmap
 } __attribute__((__packed__));
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, u64 id);
+
+STATUS term_init(struct stivale2_struct *stivale2_struct);
+
+/**
+ * This should be only used at early stages
+ */
+s32 term_print(const char *fmt, ...);
 
 #endif

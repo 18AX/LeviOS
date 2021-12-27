@@ -5,6 +5,13 @@
 
 void main(struct stivale2_struct *boot_info)
 {
+    if (term_init(boot_info) == FAILED)
+    {
+        die();
+    }
+
+    term_print("LeviOS kernel reached\n");
+
     if (arch_init(boot_info) == FAILED)
     {
         die();
