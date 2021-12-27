@@ -1,7 +1,6 @@
 #include "levi/memory/page_alloc.h"
 
 #include "levi/memory/memory.h"
-#include "levi/stivale2.h"
 
 static struct free_list *free_list_entry = NULL;
 
@@ -12,7 +11,7 @@ STATUS kframe_init(struct stivale2_struct *boot_info)
 
     if (memmap == NULL)
     {
-        return -1;
+        return FAILED;
     }
 
     struct stivale2_mmap_entry *mmap_entries = memmap->memmap;
@@ -65,7 +64,7 @@ STATUS kframe_init(struct stivale2_struct *boot_info)
 
     free_list_entry = first;
 
-    return 0;
+    return SUCCESS;
 }
 
 static struct free_list *split_block(struct free_list *block, u64 size)
@@ -183,4 +182,22 @@ void kframe_free(void *ptr, u64 pages)
     {
         merge_list(prev, n);
     }
+}
+
+void kframe_dump(void)
+{
+    struct free_list *current = free_list_entry;
+
+    term_print("----------------------------Memory "
+               "dump----------------------------\n");
+    while (current != NULL)
+    {
+        term_print("base address 0x%p size %lu\n", current,
+                   current->size * PAGE_SIZE);
+
+        current = current->next;
+    }
+
+    term_print("---------------------------------------------------------------"
+               "----\n");
 }

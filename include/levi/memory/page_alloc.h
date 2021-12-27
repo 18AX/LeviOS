@@ -1,6 +1,7 @@
 #ifndef PAGE_ALLOC
 #define PAGE_ALLOC
 
+#include "levi/stivale2.h"
 #include "levi/types.h"
 
 struct free_list
@@ -14,5 +15,7 @@ STATUS kframe_init(struct stivale2_struct *boot_info);
 void *kframe_alloc(u64 pages);
 
 void kframe_free(void *ptr, u64 pages);
+
+void kframe_dump(void);
 
 #endif
