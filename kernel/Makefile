@@ -13,6 +13,7 @@ OBJ= kmain.c.o \
 	utils/stdio.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
+	arch/x86_64/vmm.c.o \
 	arch/x86_64/arch.c.o
 
 OBJECTS= $(addprefix $(BUILDDIR)/, $(OBJ))

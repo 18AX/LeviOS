@@ -1,5 +1,21 @@
 #include "levi/memory/memory.h"
 
+STATUS memory_init(vas_t *kvas)
+{
+    if (vmmap_range(kvas, 0x0, 0x0, GIB_4, VM_READ_WRITE) == FAILED)
+    {
+        return FAILED;
+    }
+
+    if (vmmap_range(kvas, 0x0, KERNEL_ADDRESS, KERNEL_MAP_SIZE, VM_READ_WRITE)
+        == FAILED)
+    {
+        return FAILED;
+    }
+
+    return switch_vas(kvas);
+}
+
 u64 align_up(u64 ptr)
 {
     return (ptr + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
