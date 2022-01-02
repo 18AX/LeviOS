@@ -7,6 +7,12 @@
 #define VM_READ_WRITE 0x2
 #define VM_USER 0x4
 
+#define MAP_FAILED 0
+#define MAP_SUCCESS 1
+#define MAP_PRESENT 2
+
+#define MAP_STATUS u32
+
 /**
  * Those functions need to be implemented by the arch
  */
@@ -22,10 +28,12 @@ STATUS switch_vas(vas_t *vas);
 
 vas_t get_vas(void);
 
-STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags);
+MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags);
 
-STATUS vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size, u64 flags);
+MAP_STATUS vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size, u64 flags);
 
-STATUS vmunmap(vas_t *vas, u64 virts);
+MAP_STATUS vmunmap(vas_t *vas, u64 virts);
+
+MAP_STATUS vmunmap_range(vas_t *vas, u64 virt, u64 size);
 
 #endif

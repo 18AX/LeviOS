@@ -110,11 +110,11 @@ static struct pml_entry *find_page(vas_t *vm, u64 virt)
     return &pt[pml0_idx];
 }
 
-STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
+MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 {
     if (vas == NULL)
     {
-        return FAILED;
+        return MAP_FAILED;
     }
 
     struct pml_entry *pml4 = (struct pml_entry *)vas->data;
@@ -132,7 +132,7 @@ STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pdpt == NULL)
     {
-        return FAILED;
+        return MAP_FAILED;
     }
 
     struct pml_entry *pd = find_or_allocate_pml(
@@ -140,7 +140,7 @@ STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pd == NULL)
     {
-        return FAILED;
+        return MAP_FAILED;
     }
 
     struct pml_entry *pt = find_or_allocate_pml(
@@ -148,42 +148,59 @@ STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pt == NULL)
     {
-        return FAILED;
+        return MAP_FAILED;
     }
 
     if (pt[pml0_idx].present == 1)
     {
-        return FAILED;
+        if (((u64)pt[pml0_idx].page_table_addr) == physical)
+        {
+            return MAP_PRESENT;
+        }
+
+        return MAP_FAILED;
     }
 
     pt[pml0_idx].raw = flags | VM_PRESENT | (physical & ~(0xFFF));
 
-    return SUCCESS;
+    return MAP_SUCCESS;
 }
 
-STATUS vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size, u64 flags)
+MAP_STATUS vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size, u64 flags)
 {
     for (u64 i = 0; i < size; i += PAGE_SIZE)
     {
-        if (vmmap(vas, physical + i, virt + i, flags) == FAILED)
+        if (vmmap(vas, physical + i, virt + i, flags) == MAP_FAILED)
         {
-            return FAILED;
+            return MAP_FAILED;
         }
     }
 
-    return SUCCESS;
+    return MAP_SUCCESS;
 }
 
-STATUS vmunmap(vas_t *vas, u64 virt)
+MAP_STATUS vmunmap(vas_t *vas, u64 virt)
 {
     struct pml_entry *pt = find_page(vas, virt);
 
     if (pt == NULL)
     {
-        return FAILED;
+        return MAP_FAILED;
     }
 
     *pt = (struct pml_entry){ 0x0 };
 
-    return SUCCESS;
+    return MAP_SUCCESS;
+}
+MAP_STATUS vmunmap_range(vas_t *vas, u64 virt, u64 size)
+{
+    for (u64 i = 0; i < size; i += PAGE_SIZE)
+    {
+        if (vmunmap(vas, virt + i) == MAP_SUCCESS)
+        {
+            return MAP_FAILED;
+        }
+    }
+
+    return MAP_SUCCESS;
 }

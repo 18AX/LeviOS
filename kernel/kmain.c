@@ -37,6 +37,10 @@ void main(struct stivale2_struct *boot_info)
 
     term_print("Kernel address space mapped\n");
 
+    void *ptr = kmalloc(sizeof(u16) * 10);
+
+    term_print("ptr %p\n", ptr);
+
     if (arch_init(boot_info) == FAILED)
     {
         die();
