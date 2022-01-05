@@ -14,8 +14,11 @@ OBJ= kmain.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \
+	interrupts/interrupts.c.o \
 	arch/x86_64/vmm.c.o \
-	arch/x86_64/arch.c.o
+	arch/x86_64/arch.c.o \
+	arch/x86_64/idt.c.o \
+	arch/x86_64/isr_handler.S.o
 
 OBJECTS= $(addprefix $(BUILDDIR)/, $(OBJ))
 

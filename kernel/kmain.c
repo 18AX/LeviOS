@@ -1,4 +1,5 @@
 #include "levi/arch.h"
+#include "levi/interrupts/interrupts.h"
 #include "levi/memory/memory.h"
 #include "levi/memory/page_alloc.h"
 #include "levi/memory/vmm.h"
@@ -13,8 +14,7 @@ void main(struct stivale2_struct *boot_info)
         die();
     }
 
-    term_print("LeviOS kernel reached\n");
-    term_print("stivale2_struct at 0x%p\n", boot_info);
+    term_print("Initializing LeviOS...\n");
 
     if (kframe_init(boot_info) == FAILED)
     {
@@ -37,14 +37,20 @@ void main(struct stivale2_struct *boot_info)
 
     term_print("Kernel address space mapped\n");
 
-    void *ptr = kmalloc(sizeof(u16) * 10);
-
-    term_print("ptr %p\n", ptr);
+    interrupt_init();
 
     if (arch_init(boot_info) == FAILED)
     {
         die();
     }
+
+    term_print("Arch init\n");
+
+    interrupts_enable();
+
+    asm volatile("int $56");
+
+    term_print("After interrupt\n");
 
     // Unreachable code.
     die();
