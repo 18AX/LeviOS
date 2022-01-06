@@ -4,6 +4,7 @@
 #include "levi/memory/page_alloc.h"
 #include "levi/memory/vmm.h"
 #include "levi/panic.h"
+#include "levi/proc/process.h"
 #include "levi/stivale2.h"
 #include "levi/types.h"
 
@@ -51,6 +52,15 @@ void main(struct stivale2_struct *boot_info)
     asm volatile("int $56");
 
     term_print("After interrupt\n");
+
+    proc_t *kernel_proc = process_create("Levi", NULL);
+
+    if (kernel_proc == NULL)
+    {
+        term_print("Failed to create kernel process\n");
+    }
+
+    term_print("%u %s\n", kernel_proc->id, kernel_proc->name);
 
     // Unreachable code.
     die();
