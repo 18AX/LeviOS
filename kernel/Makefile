@@ -16,10 +16,15 @@ OBJ= kmain.c.o \
 	memory/kalloc.c.o \
 	interrupts/interrupts.c.o \
 	proc/process.c.o \
+	fs/fs.c.o \
+	fs/file.c.o \
+	utils/stringmap.c.o \
 	arch/x86_64/vmm.c.o \
 	arch/x86_64/arch.c.o \
 	arch/x86_64/idt.c.o \
-	arch/x86_64/isr_handler.S.o
+	arch/x86_64/isr_handler.S.o \
+	drivers/drivers.c.o \
+	drivers/serial/serial.c.o \
 
 OBJECTS= $(addprefix $(BUILDDIR)/, $(OBJ))
 

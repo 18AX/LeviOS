@@ -22,14 +22,28 @@ proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent)
 
     proc->parent = parent;
 
+    u32 f = 0;
+
     for (u64 i = 0; i < MAX_PROCESS; ++i)
     {
         if (proc_list[i] == NULL)
         {
             proc->id = i;
             proc_list[i] = proc;
+            f = 1;
             break;
         }
+    }
+
+    if (f == 0)
+    {
+        kfree(proc);
+        return NULL;
+    }
+
+    for (u32 i = 0; i < FD_TABLE_LEN; ++i)
+    {
+        proc->fds[i] = NULL;
     }
 
     return proc;

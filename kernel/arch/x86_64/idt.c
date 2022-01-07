@@ -18,7 +18,7 @@ static void set_entry(u32 index, u64 address, u16 selector, u8 ist,
     idt_entries[index].zero = 0x0;
 }
 
-void interrupts_disbale()
+void interrupts_disable()
 {
     asm volatile("sti");
 }

@@ -1,4 +1,7 @@
 #include "levi/arch.h"
+#include "levi/drivers/drivers.h"
+#include "levi/fs/file.h"
+#include "levi/fs/fs.h"
 #include "levi/interrupts/interrupts.h"
 #include "levi/memory/memory.h"
 #include "levi/memory/page_alloc.h"
@@ -61,6 +64,29 @@ void main(struct stivale2_struct *boot_info)
     }
 
     term_print("%u %s\n", kernel_proc->id, kernel_proc->name);
+
+    if (init_fs() == FAILED)
+    {
+        term_print("Failed to initialize file system\n");
+    }
+
+    if (drivers_init() == FAILED)
+    {
+        term_print("Failed to initialize drivers\n");
+    }
+
+    s32 fd = kopen("serial:COM1", O_WRONLY);
+
+    if (fd == -1)
+    {
+        term_print("Failed to open serial\n");
+    }
+
+    char data[] = "TOTO";
+
+    kwrite(fd, data, 4);
+
+    kclose(fd);
 
     // Unreachable code.
     die();

@@ -16,7 +16,7 @@ STATUS register_interrupt_handler(u64 id, interrupt_handler_t func);
 STATUS unregister_interrupt_handler(u64 id);
 
 // Arch dependant
-void interrupts_disbale(void);
+void interrupts_disable(void);
 
 void interrupts_enable(void);
 
