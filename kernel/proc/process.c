@@ -5,7 +5,8 @@
 
 static proc_t *proc_list[MAX_PROCESS] = { NULL };
 
-proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent)
+proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
+                       vas_t *vas)
 {
     proc_t *proc = kmalloc(sizeof(proc_t));
 
@@ -21,6 +22,18 @@ proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent)
     memcpy(proc->name, name, cpy_len);
 
     proc->parent = parent;
+
+    if (vas == NULL)
+    {
+        if (fill_empty_vas(&proc->vas) == FAILED)
+        {
+            kfree(proc);
+        }
+    }
+    else
+    {
+        proc->vas = *vas;
+    }
 
     u32 f = 0;
 

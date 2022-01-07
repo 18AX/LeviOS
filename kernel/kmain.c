@@ -56,7 +56,7 @@ void main(struct stivale2_struct *boot_info)
 
     term_print("After interrupt\n");
 
-    proc_t *kernel_proc = process_create("Levi", NULL);
+    proc_t *kernel_proc = process_create("Levi", NULL, &kernel_vas);
 
     if (kernel_proc == NULL)
     {
