@@ -6,7 +6,9 @@ BUILDDIR=build
 
 TARGET=$(BUILDDIR)/levi
 
-OBJ= kmain.c.o \
+.PHONY: all iso clean x86_64
+
+KERNEL_OBJ= kmain.c.o \
 	panic.c.o \
 	boot/stivale2.c.o \
 	utils/string.c.o \
@@ -19,23 +21,23 @@ OBJ= kmain.c.o \
 	fs/fs.c.o \
 	fs/file.c.o \
 	utils/stringmap.c.o \
+	drivers/drivers.c.o \
+	drivers/serial/serial.c.o \
+	devices/kbd.c.o \
+
+# x86_64
+
+x86_64_OBJ= $(KERNEL_OBJ) \
 	arch/x86_64/vmm.c.o \
 	arch/x86_64/arch.c.o \
 	arch/x86_64/idt.c.o \
 	arch/x86_64/isr_handler.S.o \
 	arch/x86_64/pic.c.o \
-	drivers/drivers.c.o \
-	drivers/serial/serial.c.o \
-	devices/kbd.c.o \
 
-OBJECTS= $(addprefix $(BUILDDIR)/, $(OBJ))
+x86_64: CFLAGS += -Dx86_64
+x86_64: $(addprefix $(BUILDDIR)/, $(x86_64_OBJ))
+	$(CC) $^ -o $(TARGET) $(LFLAGS)
 
-.PHONY: all iso clean
-
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $(TARGET) $(LFLAGS)
 
 $(BUILDDIR)/%.c.o: %.c
 	$(HIDE) mkdir -p $(shell dirname $@)
@@ -46,4 +48,4 @@ $(BUILDDIR)/%.S.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJECTS) $(TARGET)
+	$(RM) -r $(BUILDDIR)

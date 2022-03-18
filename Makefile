@@ -2,11 +2,11 @@
 
 all: iso
 
-iso: kernel
+iso: x86_64
 	./makeiso.sh
 
-kernel:
-	$(MAKE) -C kernel
+x86_64:
+	$(MAKE) -C kernel x86_64
 
 clean:
-	$(MAKE) -C kernel clean
+	$(MAKE) -C kernel clean levi.iso

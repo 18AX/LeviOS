@@ -4,10 +4,12 @@
 
 STATUS drivers_init()
 {
+#if x86_64
     if (serial_init() == FAILED)
     {
         return FAILED;
     }
+#endif
 
     return SUCCESS;
 }
