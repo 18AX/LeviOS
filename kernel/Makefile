@@ -23,6 +23,7 @@ OBJ= kmain.c.o \
 	arch/x86_64/arch.c.o \
 	arch/x86_64/idt.c.o \
 	arch/x86_64/isr_handler.S.o \
+	arch/x86_64/pic.c.o \
 	drivers/drivers.c.o \
 	drivers/serial/serial.c.o \
 	devices/kbd.c.o \

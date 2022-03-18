@@ -20,12 +20,12 @@ static void set_entry(u32 index, u64 address, u16 selector, u8 ist,
 
 void interrupts_disable()
 {
-    asm volatile("sti");
+    asm volatile("cli");
 }
 
 void interrupts_enable()
 {
-    asm volatile("cli");
+    asm volatile("sti");
 }
 
 void __isr_c_handler(struct interrupt_context *ctx)

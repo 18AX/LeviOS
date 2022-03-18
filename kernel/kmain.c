@@ -68,12 +68,6 @@ void main(struct stivale2_struct *boot_info)
 
     interrupts_enable();
 
-    asm volatile("mov $4,%%rdi\n"
-                 "int $56\n"
-                 :
-                 :
-                 : "rdi");
-
     term_print("After interrupt\n");
 
     if (init_fs() == FAILED)
@@ -98,6 +92,11 @@ void main(struct stivale2_struct *boot_info)
     kwrite(fd, data, 4);
 
     kclose(fd);
+
+    for (;;)
+    {
+        asm volatile("hlt");
+    }
 
     // Unreachable code.
     die();
