@@ -11,19 +11,19 @@
 #include "levi/stivale2.h"
 #include "levi/types.h"
 
-void main(struct stivale2_struct *boot_info)
+static STATUS early_init(struct stivale2_struct *boot_info)
 {
     if (term_init(boot_info) == FAILED)
     {
-        die();
+        return FAILED;
     }
 
     term_print("Initializing LeviOS...\n");
 
     if (kframe_init(boot_info) == FAILED)
     {
-        term_print("\n\nkframe_init failed");
-        die();
+        term_print("Failed to init frame allocator");
+        return FAILED;
     }
 
     kframe_dump();
@@ -33,7 +33,7 @@ void main(struct stivale2_struct *boot_info)
     if (fill_empty_vas(&kernel_vas) == FAILED)
     {
         term_print("Failed to initialize kernel virtual address space");
-        die();
+        return FAILED;
     }
 
     // Map all virtual memory
@@ -45,17 +45,9 @@ void main(struct stivale2_struct *boot_info)
 
     if (arch_init(boot_info) == FAILED)
     {
-        die();
+        term_print("Failed to initialize arch\n");
+        return FAILED;
     }
-
-    term_print("Arch init\n");
-
-    interrupts_enable();
-
-    asm volatile("int $56");
-
-    term_print("After interrupt\n");
-
     proc_t *kernel_proc = process_create("Levi", NULL, &kernel_vas);
 
     if (kernel_proc == NULL)
@@ -63,7 +55,26 @@ void main(struct stivale2_struct *boot_info)
         term_print("Failed to create kernel process\n");
     }
 
-    term_print("%u %s\n", kernel_proc->id, kernel_proc->name);
+    return SUCCESS;
+}
+
+void main(struct stivale2_struct *boot_info)
+{
+    if (early_init(boot_info) == FAILED)
+    {
+        term_print("Failed to initialize kernel\n");
+        die();
+    }
+
+    interrupts_enable();
+
+    asm volatile("mov $4,%%rdi\n"
+                 "int $56\n"
+                 :
+                 :
+                 : "rdi");
+
+    term_print("After interrupt\n");
 
     if (init_fs() == FAILED)
     {
