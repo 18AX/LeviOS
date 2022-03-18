@@ -20,8 +20,7 @@ isr_\nb:
 .endm
 
 isr_handler:
-    pushq %rsp
-    pushq %rbp
+    cld
     pushq %r15
     pushq %r14
     pushq %r13
@@ -54,16 +53,9 @@ isr_handler:
     popq %r13
     popq %r14
     popq %r15
-    popq %rbp
-    popq %rsp
 
     add $0x10,%rsp
 
-    iretq
-
-.global test_isr
-
-test_isr:
     iretq
 
 ISR_NO_ERR 0

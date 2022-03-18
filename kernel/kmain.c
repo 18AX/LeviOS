@@ -1,4 +1,5 @@
 #include "levi/arch.h"
+#include "levi/devices/kbd.h"
 #include "levi/drivers/drivers.h"
 #include "levi/fs/file.h"
 #include "levi/fs/fs.h"
@@ -91,12 +92,36 @@ void main(struct stivale2_struct *boot_info)
 
     kwrite(fd, data, 4);
 
-    kclose(fd);
+    kbd_init();
+
+    u64 i = 0;
+#if 0
+    asm volatile (
+        "mov $4,%%rdi\n"
+        "int $80\n" : : : "rdi"
+    );
+
+#endif
 
     for (;;)
     {
-        asm volatile("hlt");
+#if 1
+        if (i % 10000000 == 0)
+        {
+            term_print("HERE %ld %ld\n", get_state(), get_state() & KEYCODE_A);
+        }
+#endif
+        if (key_state(KEYCODE_A) == KEY_PRESS)
+        {
+            kwrite(fd, data, 4);
+        }
+
+        i++;
     }
+
+    kclose(fd);
+
+    term_print("WTF\n");
 
     // Unreachable code.
     die();

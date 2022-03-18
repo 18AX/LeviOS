@@ -9,4 +9,5 @@ x86_64:
 	$(MAKE) -C kernel x86_64
 
 clean:
-	$(MAKE) -C kernel clean levi.iso
+	$(MAKE) -C kernel clean
+	$(RM) levi.iso

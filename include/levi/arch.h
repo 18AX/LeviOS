@@ -22,8 +22,6 @@ typedef struct registers
     u64 r13;
     u64 r14;
     u64 r15;
-    u64 rbp;
-    u64 rsp;
 } __attribute__((packed)) regs_t;
 
 STATUS arch_init(struct stivale2_struct *boot_info);
