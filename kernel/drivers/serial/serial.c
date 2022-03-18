@@ -35,16 +35,16 @@ static file_t *__open(const char *name, u32 flags)
 {
     if (strcmp(name, "COM1"))
     {
+        outb(COM1 + 3, 0x80); // Set DLAB to 1
+        outb(COM1 + 0, 0x00); // Divisor low byte for 38400 bps
+        outb(COM1 + 1, 0x03); // Divisor high byte for 38400 bps
+        outb(COM1 + 3, 0x03);
+
         outb(COM1, 0x03); // 00000011: No parity and 8 bits
         outb(COM1 + 2,
              0xC7); // 11000111: interrupt trigger level 14 bytes, Clear
                     // transmit fifo (bit 2), Clear Receive fifo (bit 1), enable
                     // fifo (bit 0)
-
-        outb(COM1 + 3, 0x80); // Set DLAB to 1
-        outb(COM1 + 0, 0x00); // Divisor low byte for 38400 bps
-        outb(COM1 + 1, 0x03); // Divisor high byte for 38400 bps
-        outb(COM1 + 3, 0x03);
 
         file_t *file = kmalloc(sizeof(file_t));
         file->data = (void *)COM1;
