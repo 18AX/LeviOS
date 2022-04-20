@@ -1,10 +1,49 @@
 #include "levi/arch/x86_64/idt.h"
 
+#include <levi/arch/x86_64/cpuregs.h>
+#include <levi/memory/vmm.h>
+#include <levi/panic.h>
+
 #include "levi/arch/x86_64/gdt.h"
 #include "levi/interrupts/interrupts.h"
 
 static struct idt_64_entry idt_entries[0xFF] = { 0 };
 static struct idt_64_ptr idt_ptr = { sizeof(idt_entries), (u64)idt_entries };
+
+static const char exceptions_message[32][32] = {
+    "Divide-by-zero Error",
+    "Debug",
+    "Non-maskable Interrupt",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 Floating-Point Exception",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point Exception",
+    "Virtualization Exception",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved"
+};
 
 static void set_entry(u32 index, u64 address, u16 selector, u8 ist,
                       u8 type_attr)
@@ -28,8 +67,45 @@ void interrupts_enable()
     asm volatile("sti");
 }
 
+static void handle_exception(struct interrupt_context *ctx)
+{
+    term_print("PANIC: %s\n", exceptions_message[ctx->index]);
+    term_print("error code %lx saved rip: 0x%lx cs: %lx\n", ctx->error_code,
+               ctx->rip, ctx->cs);
+
+    switch (ctx->index)
+    {
+    case 0xE: {
+        u64 cr2 = cr2_read();
+        term_print("cr2: %lx\n", cr2);
+
+        u64 phys_addrr = 0x0;
+        vas_t curr_vas = get_vas();
+
+        if (vma_to_phys(&curr_vas, cr2, &phys_addrr) == MAP_FAILED)
+        {
+            term_print("Page not present\n");
+        }
+        else
+        {
+            term_print("%lx -> %lx\n", cr2, phys_addrr);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    die();
+}
+
 void __isr_c_handler(struct interrupt_context *ctx)
 {
+    if (ctx->index < 32)
+    {
+        handle_exception(ctx);
+        return;
+    }
+
     throw_interrupts(ctx->index, ctx->error_code, &ctx->regs);
 }
 

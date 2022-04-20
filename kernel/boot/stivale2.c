@@ -46,7 +46,7 @@ __attribute__((section(".stivale2hdr"),
     .stack = (u64)(stack + sizeof(stack)),
     // Bit 1, if set, causes the bootloader to return to us pointers in the
     // higher half, which we likely want.
-    .flags = (1 << 1),
+    .flags = 0, //(1 << 1),
     // This header structure is the root of the linked list of header tags and
     // points to the first one in the linked list.
     .tags = (u64)&framebuffer_hdr_tag

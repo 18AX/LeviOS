@@ -12,6 +12,8 @@ struct interrupt_context
     regs_t regs;
     u64 index;
     u64 error_code;
+    u64 rip;
+    u64 cs;
 } __attribute__((packed));
 
 struct idt_64_entry

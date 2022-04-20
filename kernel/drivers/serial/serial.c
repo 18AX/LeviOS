@@ -3,7 +3,6 @@
 #include "levi/arch/x86_64/io.h"
 #include "levi/fs/fs.h"
 #include "levi/memory/memory.h"
-#include "levi/stivale2.h"
 #include "levi/utils/string.h"
 
 static file_t *__open(const char *name, u32 flags);
@@ -27,7 +26,6 @@ static vfs serial_vfs = { .name = "serial",
 
 STATUS serial_init()
 {
-    term_print("SERIAL INIT\n");
     return register_fs(&serial_vfs);
 }
 

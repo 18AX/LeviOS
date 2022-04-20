@@ -204,3 +204,17 @@ MAP_STATUS vmunmap_range(vas_t *vas, u64 virt, u64 size)
 
     return MAP_SUCCESS;
 }
+
+MAP_STATUS vma_to_phys(vas_t *vas, u64 virt, u64 *phys)
+{
+    struct pml_entry *page = find_page(vas, virt);
+
+    if (page == NULL)
+    {
+        return MAP_FAILED;
+    }
+
+    *phys = LSHIFT(page->page_table_addr, 12) | (virt & 0xFFF);
+
+    return MAP_SUCCESS;
+}

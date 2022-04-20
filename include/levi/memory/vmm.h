@@ -36,4 +36,6 @@ MAP_STATUS vmunmap(vas_t *vas, u64 virts);
 
 MAP_STATUS vmunmap_range(vas_t *vas, u64 virt, u64 size);
 
+MAP_STATUS vma_to_phys(vas_t *vas, u64 virt, u64 *phys);
+
 #endif

@@ -34,6 +34,8 @@ x86_64_OBJ= $(KERNEL_OBJ) \
 	arch/x86_64/idt.c.o \
 	arch/x86_64/isr_handler.S.o \
 	arch/x86_64/pic.c.o \
+	arch/x86_64/acpi.c.o \
+	arch/x86_64/cpuregs.c.o \
 
 x86_64: CFLAGS += -Dx86_64
 x86_64: $(addprefix $(BUILDDIR)/, $(x86_64_OBJ))

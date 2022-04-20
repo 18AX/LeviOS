@@ -21,6 +21,8 @@ static STATUS early_init(struct stivale2_struct *boot_info)
 
     term_print("Initializing LeviOS...\n");
 
+    term_print("stivale2 boot structure 0x%lx\n", boot_info);
+
     if (kframe_init(boot_info) == FAILED)
     {
         term_print("Failed to init frame allocator");
