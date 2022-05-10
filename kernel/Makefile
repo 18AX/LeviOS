@@ -25,6 +25,7 @@ KERNEL_OBJ= kmain.c.o \
 	drivers/serial/serial.c.o \
 	devices/kbd.c.o \
 	devices/kbd/intel8042.c.o \
+	syscall/syscall.c.o \
 
 # x86_64
 
@@ -36,6 +37,8 @@ x86_64_OBJ= $(KERNEL_OBJ) \
 	arch/x86_64/pic.c.o \
 	arch/x86_64/acpi.c.o \
 	arch/x86_64/cpuregs.c.o \
+	arch/x86_64/pci.c.o \
+	arch/x86_64/syscall64.c.o \
 
 x86_64: CFLAGS += -Dx86_64
 x86_64: $(addprefix $(BUILDDIR)/, $(x86_64_OBJ))

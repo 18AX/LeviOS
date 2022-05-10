@@ -7,7 +7,7 @@ static struct rsdp2 *rsdp = NULL;
 static struct xsdt *xsdt = NULL;
 static struct rsdt *rsdt = NULL;
 
-u32 acpi_init(struct stivale2_struct *boot_info)
+STATUS acpi_init(struct stivale2_struct *boot_info)
 {
     struct stivale2_struct_tag_rsdp *rsdp_tag =
         stivale2_get_tag(boot_info, STIVALE2_STRUCT_TAG_RSDP_ID);
@@ -50,13 +50,21 @@ static struct acpi_sdt_header *__xsdt_find(const char sig[4])
 
 static struct acpi_sdt_header *__rsdt_find(const char sig[4])
 {
+    term_print("rsdt ptr %p\n", rsdt);
+
     u64 rsdt_len =
         (rsdt->header.len - sizeof(struct acpi_sdt_header)) / sizeof(u32);
 
+    term_print("rsdt len %ld\n", rsdt_len);
+
+    term_print("rsdt array %p\n", rsdt->rsdt_table);
     for (u64 i = 0; i < rsdt_len; ++i)
     {
         struct acpi_sdt_header *h =
             (struct acpi_sdt_header *)((u64)rsdt->rsdt_table[i]);
+
+        term_print("sdt header: %p\n", h);
+        term_print("Sig: %.4s\n", h->signature);
 
         if (strncmp(sig, h->signature, 4) == 0)
         {

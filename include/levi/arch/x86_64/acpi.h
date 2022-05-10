@@ -26,6 +26,7 @@
 #define SDT_SIG_SRAT "SRAT"
 #define SDT_SIG_SSDT "SSDT"
 #define SDT_SIG_XSDT "XSDT"
+#define SDT_SIG_MCFG "MCFG"
 
 struct rsdp
 {
@@ -61,16 +62,16 @@ struct acpi_sdt_header
 struct xsdt
 {
     struct acpi_sdt_header header;
-    u64 *xsdt_table;
+    u64 xsdt_table[0];
 } __attribute__((packed));
 
 struct rsdt
 {
     struct acpi_sdt_header header;
-    u32 *rsdt_table;
+    u32 rsdt_table[0];
 } __attribute__((packed));
 
-u32 acpi_init(struct stivale2_struct *boot_info);
+STATUS acpi_init(struct stivale2_struct *boot_info);
 
 struct acpi_sdt_header *sdt_find(const char sig[4]);
 
