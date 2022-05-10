@@ -51,7 +51,7 @@ static STATUS early_init(struct stivale2_struct *boot_info)
         term_print("Failed to initialize arch\n");
         return FAILED;
     }
-    proc_t *kernel_proc = process_create("Levi", NULL, &kernel_vas);
+    proc_t *kernel_proc = process_create("Levi", NULL, &kernel_vas, 0x0);
 
     if (kernel_proc == NULL)
     {

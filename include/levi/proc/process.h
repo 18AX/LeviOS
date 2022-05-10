@@ -9,6 +9,8 @@
 #define MAX_PROCESS 1024
 #define FD_TABLE_LEN 128
 
+#define PROCESS_SHARED_VAS 1
+
 typedef struct process
 {
     u32 id;
@@ -19,7 +21,7 @@ typedef struct process
 } proc_t;
 
 proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
-                       vas_t *vas);
+                       vas_t *vas, u32 flags);
 
 void process_delete(proc_t *proc);
 

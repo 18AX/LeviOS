@@ -1,8 +1,8 @@
-#include "levi/memory/vmm.h"
-
-#include "levi/arch/x86_64/paging.h"
-#include "levi/memory/memory.h"
-#include "levi/memory/page_alloc.h"
+#include <levi/arch/x86_64/paging.h>
+#include <levi/memory/memory.h>
+#include <levi/memory/page_alloc.h>
+#include <levi/memory/vmm.h>
+#include <levi/utils/string.h>
 
 STATUS switch_vas(vas_t *vas)
 {
@@ -217,4 +217,36 @@ MAP_STATUS vma_to_phys(vas_t *vas, u64 virt, u64 *phys)
     *phys = LSHIFT(page->page_table_addr, 12) | (virt & 0xFFF);
 
     return MAP_SUCCESS;
+}
+
+MAP_STATUS vascpy(vas_t *dst, vas_t *src)
+{
+    memcpy(dst->data, src->data, PAGE_SIZE);
+
+    return MAP_SUCCESS;
+}
+
+static void destroy_vas_rec(struct pml_entry *entry)
+{
+    if (entry == NULL)
+    {
+        return;
+    }
+
+    for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
+    {
+        destroy_vas_rec(
+            (struct pml_entry *)((u64)LSHIFT(entry[i].page_table_addr, 12)));
+    }
+
+    kframe_free(entry, 1);
+}
+
+void destroy_vas(vas_t *vas)
+{
+    struct pml_entry *pml = vas->data;
+
+    destroy_vas_rec(pml);
+
+    kfree(vas);
 }
