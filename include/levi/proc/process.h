@@ -9,7 +9,8 @@
 #define MAX_PROCESS 1024
 #define FD_TABLE_LEN 128
 
-#define PROCESS_SHARED_VAS 1
+#define PROCESS_KERNEL 0x1
+#define PROCESS_SHARED_VAS 0x2
 
 typedef struct process
 {
