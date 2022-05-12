@@ -1,16 +1,17 @@
-#include "levi/arch.h"
-#include "levi/devices/kbd.h"
-#include "levi/drivers/drivers.h"
-#include "levi/fs/file.h"
-#include "levi/fs/fs.h"
-#include "levi/interrupts/interrupts.h"
-#include "levi/memory/memory.h"
-#include "levi/memory/page_alloc.h"
-#include "levi/memory/vmm.h"
-#include "levi/panic.h"
-#include "levi/proc/process.h"
-#include "levi/stivale2.h"
-#include "levi/types.h"
+#include <levi/arch.h>
+#include <levi/devices/kbd.h>
+#include <levi/drivers/drivers.h>
+#include <levi/fs/file.h>
+#include <levi/fs/fs.h>
+#include <levi/interrupts/interrupts.h>
+#include <levi/memory/memory.h>
+#include <levi/memory/page_alloc.h>
+#include <levi/memory/vmm.h>
+#include <levi/panic.h>
+#include <levi/proc/process.h>
+#include <levi/proc/scheduler.h>
+#include <levi/stivale2.h>
+#include <levi/types.h>
 
 static STATUS early_init(struct stivale2_struct *boot_info)
 {
@@ -58,6 +59,8 @@ static STATUS early_init(struct stivale2_struct *boot_info)
     {
         term_print("Failed to create kernel process\n");
     }
+
+    sched_set(kernel_proc->id);
 
     return SUCCESS;
 }

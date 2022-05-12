@@ -1,20 +1,11 @@
 #ifndef IDT_HEADER
 #define IDT_HEADER
 
-#include "levi/arch.h"
-#include "levi/types.h"
+#include <levi/arch.h>
+#include <levi/types.h>
 
 #define INTERRUPT_GATE 0x8E
 #define TRAP_GATE 0xF
-
-struct interrupt_context
-{
-    regs_t regs;
-    u64 index;
-    u64 error_code;
-    u64 rip;
-    u64 cs;
-} __attribute__((packed));
 
 struct idt_64_entry
 {
@@ -35,6 +26,6 @@ struct idt_64_ptr
 
 void idt_init(void);
 
-void __isr_c_handler(struct interrupt_context *ctx);
+void __isr_c_handler(context_t *ctx);
 
 #endif

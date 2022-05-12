@@ -1,13 +1,14 @@
 #ifndef INTERRUPTS_HEADER
 #define INTERRUPTS_HEADER
 
-#include "levi/arch.h"
+#include <levi/arch.h>
+#include <levi/proc/process.h>
 
 #define INTERRUPTS_NUMBER 0xFF
 
-typedef void (*interrupt_handler_t)(u64 id, u64 error_code, regs_t *regs);
+typedef void (*interrupt_handler_t)(u64 id, u64 error_code, proc_t *proc);
 
-void throw_interrupts(u64 id, u64 errror_code, regs_t *regs);
+void throw_interrupts(u64 id, u64 error_code, proc_t *proc);
 
 void interrupt_init(void);
 

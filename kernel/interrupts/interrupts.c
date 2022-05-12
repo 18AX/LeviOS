@@ -3,10 +3,10 @@
 #include "levi/panic.h"
 #include "levi/stivale2.h"
 
-static void default_handler(u64 id, u64 error_code, regs_t *regs)
+static void default_handler(u64 id, u64 error_code, proc_t *proc)
 {
     term_print("isr: %lu error_code: %lu rdi: %lu\n", id, error_code,
-               regs->rdi);
+               proc->ctx.regs.rdi);
 
     if (id < 30)
     {
@@ -17,9 +17,9 @@ static void default_handler(u64 id, u64 error_code, regs_t *regs)
 
 static interrupt_handler_t handlers[INTERRUPTS_NUMBER] = { 0x0 };
 
-void throw_interrupts(u64 id, u64 error_code, regs_t *regs)
+void throw_interrupts(u64 id, u64 error_code, proc_t *proc)
 {
-    handlers[id](id, error_code, regs);
+    handlers[id](id, error_code, proc);
 }
 
 void interrupt_init()

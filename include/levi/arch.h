@@ -4,7 +4,9 @@
 #include "levi/stivale2.h"
 #include "levi/types.h"
 
-// Struct registers to ne define by the arch
+// Struct registers to be define by the arch
+
+#if 1
 
 typedef struct registers
 {
@@ -24,6 +26,18 @@ typedef struct registers
     u64 r15;
 } __attribute__((packed)) regs_t;
 
-STATUS arch_init(struct stivale2_struct *boot_info);
+typedef struct context
+{
+    regs_t regs;
+    u64 index;
+    u64 error_code;
+    u64 rip;
+    u64 cs;
+} __attribute__((packed)) context_t;
+
+#endif
+
+STATUS
+arch_init(struct stivale2_struct *boot_info);
 
 #endif

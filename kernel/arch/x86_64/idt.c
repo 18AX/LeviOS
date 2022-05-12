@@ -1,11 +1,13 @@
 #include "levi/arch/x86_64/idt.h"
 
 #include <levi/arch/x86_64/cpuregs.h>
+#include <levi/arch/x86_64/gdt.h>
+#include <levi/interrupts/interrupts.h>
 #include <levi/memory/vmm.h>
 #include <levi/panic.h>
-
-#include "levi/arch/x86_64/gdt.h"
-#include "levi/interrupts/interrupts.h"
+#include <levi/proc/process.h>
+#include <levi/proc/scheduler.h>
+#include <levi/utils/string.h>
 
 static struct idt_64_entry idt_entries[0xFF] = { 0 };
 static struct idt_64_ptr idt_ptr = { sizeof(idt_entries), (u64)idt_entries };
@@ -67,20 +69,21 @@ void interrupts_enable()
     asm volatile("sti");
 }
 
-static void handle_exception(struct interrupt_context *ctx)
+static void handle_exception(u64 index, u64 error_code, proc_t *proc)
 {
-    term_print("PANIC: %s\n", exceptions_message[ctx->index]);
-    term_print("error code %lx saved rip: 0x%lx cs: %lx\n", ctx->error_code,
-               ctx->rip, ctx->cs);
+    term_print("PANIC: %s\n", exceptions_message[index]);
 
-    switch (ctx->index)
+    term_print("error code %lx saved rip: 0x%lx cs: %lx\n", error_code,
+               proc->ctx.rip, proc->ctx.cs);
+
+    switch (index)
     {
     case 0xE: {
         u64 cr2 = cr2_read();
         term_print("cr2: %lx\n", cr2);
 
         u64 phys_addrr = 0x0;
-        vas_t curr_vas = get_vas();
+        vas_t curr_vas = proc->vas;
 
         if (vma_to_phys(&curr_vas, cr2, &phys_addrr) == MAP_FAILED)
         {
@@ -98,15 +101,25 @@ static void handle_exception(struct interrupt_context *ctx)
     die();
 }
 
-void __isr_c_handler(struct interrupt_context *ctx)
+void __isr_c_handler(context_t *ctx)
 {
-    if (ctx->index < 32)
+    // Saving the context
+
+    proc_t *proc = proc_get(sched_get());
+
+    if (proc == NULL)
     {
-        handle_exception(ctx);
-        return;
+        die();
     }
 
-    throw_interrupts(ctx->index, ctx->error_code, &ctx->regs);
+    memcpy(&proc->ctx, ctx, sizeof(context_t));
+
+    throw_interrupts(ctx->index, ctx->error_code, proc);
+
+    proc = proc_get(sched_get());
+
+    // Restore process context
+    memcpy(ctx, &proc->ctx, sizeof(context_t));
 }
 
 extern void isr_0(void);
@@ -628,4 +641,10 @@ void idt_init()
     set_entry(254, (u64)isr_254, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
 
     asm volatile("lidt %0\n\t" ::"m"(idt_ptr));
+
+    // Register exceptions
+    for (u32 i = 0; i < 32; ++i)
+    {
+        register_interrupt_handler(i, handle_exception);
+    }
 }

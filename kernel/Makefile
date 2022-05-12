@@ -18,6 +18,7 @@ KERNEL_OBJ= kmain.c.o \
 	memory/kalloc.c.o \
 	interrupts/interrupts.c.o \
 	proc/process.c.o \
+	proc/scheduler.c.o \
 	fs/fs.c.o \
 	fs/file.c.o \
 	utils/stringmap.c.o \

@@ -2,13 +2,15 @@
 #include <levi/interrupts/interrupts.h>
 #include <levi/syscall/syscall.h>
 
-static void syscall_handler(u64 id, u64 error_code, regs_t *regs)
+static void syscall_handler(u64 id, u64 error_code, proc_t *proc)
 {
     (void)id;
     (void)error_code;
-    u64 result = syscall(regs->rax, regs->rdi, regs->rsi, regs->rdx, regs->r10);
+    u64 result =
+        syscall(proc, proc->ctx.regs.rax, proc->ctx.regs.rdi,
+                proc->ctx.regs.rsi, proc->ctx.regs.rdx, proc->ctx.regs.r10);
 
-    regs->rax = result;
+    proc->ctx.regs.rax = result;
 }
 
 void syscall64_init()

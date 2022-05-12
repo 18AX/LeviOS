@@ -1,9 +1,10 @@
 #ifndef PROCESS_HEADER
 #define PROCESS_HEADER
 
-#include "levi/fs/fs.h"
-#include "levi/memory/vmm.h"
-#include "levi/types.h"
+#include <levi/arch.h>
+#include <levi/fs/fs.h>
+#include <levi/memory/vmm.h>
+#include <levi/types.h>
 
 #define PROCESS_NAME_LEN 32
 #define MAX_PROCESS 1024
@@ -19,6 +20,7 @@ typedef struct process
     struct process *parent;
     vas_t vas;
     file_t *fds[FD_TABLE_LEN];
+    context_t ctx;
 } proc_t;
 
 proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
