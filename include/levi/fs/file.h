@@ -1,12 +1,8 @@
 #ifndef FILE_HEADER
 #define FILE_HEADER
 
-#include "levi/proc/process.h"
-#include "levi/types.h"
-
-#define O_RDONLY 00
-#define O_WRONLY 01
-#define O_RDWR 02
+#include <levi/proc/process.h>
+#include <levi/types.h>
 
 s32 open(const char *pathname, u32 flags, proc_t *process);
 

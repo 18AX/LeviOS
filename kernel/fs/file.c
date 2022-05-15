@@ -1,6 +1,5 @@
-#include "levi/fs/file.h"
-
-#include "levi/fs/fs.h"
+#include <levi/fs/file.h>
+#include <levi/fs/fs.h>
 
 s32 open(const char *pathname, u32 flags, proc_t *process)
 {
@@ -29,7 +28,7 @@ s32 open(const char *pathname, u32 flags, proc_t *process)
 
 STATUS close(s32 fd, proc_t *process)
 {
-    if (fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
         return FAILED;
     }
@@ -50,19 +49,20 @@ STATUS close(s32 fd, proc_t *process)
 
 s32 write(s32 fd, void *buffer, u32 size, proc_t *process)
 {
-    if (fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
         return -1;
     }
 
     file_t *f = process->fds[fd];
 
-    if ((f->flags & O_WRONLY) == 0 && (f->flags & O_RDWR) == 0)
+    if ((f->flags & FS_WRITE) == 0)
     {
         return -1;
     }
 
-    if (f->vfs->operation->write == NULL)
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->write == NULL)
     {
         return -1;
     }
@@ -72,14 +72,15 @@ s32 write(s32 fd, void *buffer, u32 size, proc_t *process)
 
 s32 read(s32 fd, void *buffer, u32 size, proc_t *process)
 {
-    if (fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
         return -1;
     }
 
     file_t *f = process->fds[fd];
 
-    if (f->vfs->operation->read == NULL)
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->read == NULL)
     {
         return -1;
     }

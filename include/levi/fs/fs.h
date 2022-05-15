@@ -3,6 +3,9 @@
 
 #include "levi/types.h"
 
+#define FS_READ 0x0
+#define FS_WRITE 0x1
+
 typedef struct file
 {
     u32 flags;

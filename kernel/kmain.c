@@ -87,7 +87,7 @@ void main(struct stivale2_struct *boot_info)
         term_print("Failed to initialize drivers\n");
     }
 
-    s32 fd = kopen("serial:COM1", O_WRONLY);
+    s32 fd = kopen("serial:COM1", FS_WRITE);
 
     if (fd == -1)
     {

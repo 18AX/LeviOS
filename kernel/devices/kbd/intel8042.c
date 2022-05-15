@@ -19,11 +19,12 @@ static enum keycode translate_to_keycode(u8 key)
     return KEYCODE_UNKNOWN;
 }
 
-static void irq_handler(u64 id, u64 error_code, regs_t *regs)
+static void irq_handler(u64 id, u64 error_code, proc_t *proc)
 {
     (void)id;
     (void)error_code;
-    (void)regs;
+    (void)proc;
+
     u8 status = inb(INTEL8042_STATUS);
 
     while ((status & 1) == 0)

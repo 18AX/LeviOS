@@ -1,6 +1,5 @@
-#include "levi/drivers/drivers.h"
-
-#include "levi/drivers/serial/serial.h"
+#include <levi/drivers/drivers.h>
+#include <levi/drivers/serial/serial.h>
 
 STATUS drivers_init()
 {

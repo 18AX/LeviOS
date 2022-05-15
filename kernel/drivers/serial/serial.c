@@ -31,7 +31,12 @@ STATUS serial_init()
 
 static file_t *__open(const char *name, u32 flags)
 {
-    if (strcmp(name, "COM1"))
+    if ((flags & FS_WRITE) == 0)
+    {
+        return NULL;
+    }
+
+    if (strcmp(name, "COM1") == 0)
     {
         outb(COM1 + 3, 0x80); // Set DLAB to 1
         outb(COM1 + 0, 0x00); // Divisor low byte for 38400 bps
@@ -46,10 +51,6 @@ static file_t *__open(const char *name, u32 flags)
 
         file_t *file = kmalloc(sizeof(file_t));
         file->data = (void *)COM1;
-        file->vfs = &serial_vfs;
-        file->flags = flags;
-        file->cursor_position = 0;
-        file->open_count = 0;
 
         return file;
     }
