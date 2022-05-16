@@ -512,7 +512,8 @@ void idt_init()
     set_entry(125, (u64)isr_125, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
     set_entry(126, (u64)isr_126, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
     set_entry(127, (u64)isr_127, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
-    set_entry(128, (u64)isr_128, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
+    set_entry(128, (u64)isr_128, SEGMENT_SELECTOR(5, 0, 0), 0,
+              INTERRUPT_GATE | ALLOW_TO_USER); // Gate used for syscall
     set_entry(129, (u64)isr_129, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
     set_entry(130, (u64)isr_130, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);
     set_entry(131, (u64)isr_131, SEGMENT_SELECTOR(5, 0, 0), 0, INTERRUPT_GATE);

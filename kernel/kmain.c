@@ -3,10 +3,12 @@
 #include <levi/drivers/drivers.h>
 #include <levi/fs/file.h>
 #include <levi/fs/fs.h>
+#include <levi/fs/memfs.h>
 #include <levi/interrupts/interrupts.h>
 #include <levi/memory/memory.h>
 #include <levi/memory/page_alloc.h>
 #include <levi/memory/vmm.h>
+#include <levi/modules/module.h>
 #include <levi/panic.h>
 #include <levi/proc/process.h>
 #include <levi/proc/scheduler.h>
@@ -52,6 +54,9 @@ static STATUS early_init(struct stivale2_struct *boot_info)
         term_print("Failed to initialize arch\n");
         return FAILED;
     }
+
+    term_print("Arch intialized\n");
+
     proc_t *kernel_proc =
         process_create("Levi", NULL, &kernel_vas, PROCESS_KERNEL);
 
@@ -65,6 +70,37 @@ static STATUS early_init(struct stivale2_struct *boot_info)
     return SUCCESS;
 }
 
+static STATUS init(struct stivale2_struct *boot_info)
+{
+    term_print("After interrupt\n");
+
+    if (init_fs() == FAILED)
+    {
+        term_print("Failed to initialize file system\n");
+    }
+
+    if (memfs_init() == FAILED)
+    {
+        term_print("Failed to initialize memfs\n");
+        return FAILED;
+    }
+
+    term_print("Memfs initialized\n");
+
+    if (drivers_init() == FAILED)
+    {
+        term_print("Failed to initialize drivers\n");
+    }
+
+    term_print("Drivers initialized\n");
+
+    u32 nbr_modules = module_init(boot_info);
+
+    term_print("%u modules loaded\n", nbr_modules);
+
+    return SUCCESS;
+}
+
 void main(struct stivale2_struct *boot_info)
 {
     if (early_init(boot_info) == FAILED)
@@ -73,61 +109,13 @@ void main(struct stivale2_struct *boot_info)
         die();
     }
 
+    if (init(boot_info) == FAILED)
+    {
+        term_print("Failed to initialize kernel\n");
+        die();
+    }
+
     interrupts_enable();
-
-    term_print("After interrupt\n");
-
-    if (init_fs() == FAILED)
-    {
-        term_print("Failed to initialize file system\n");
-    }
-
-    if (drivers_init() == FAILED)
-    {
-        term_print("Failed to initialize drivers\n");
-    }
-
-    s32 fd = kopen("serial:COM1", FS_WRITE);
-
-    if (fd == -1)
-    {
-        term_print("Failed to open serial\n");
-    }
-
-    char data[] = "TOTO";
-
-    kwrite(fd, data, 4);
-
-    kbd_init();
-
-    u64 i = 0;
-#if 0
-    asm volatile (
-        "mov $4,%%rdi\n"
-        "int $80\n" : : : "rdi"
-    );
-
-#endif
-
-    for (;;)
-    {
-#if 1
-        if (i % 10000000 == 0)
-        {
-            term_print("HERE %ld %ld\n", get_state(), get_state() & KEYCODE_A);
-        }
-#endif
-        if (key_state(KEYCODE_A) == KEY_PRESS)
-        {
-            kwrite(fd, data, 4);
-        }
-
-        i++;
-    }
-
-    kclose(fd);
-
-    term_print("WTF\n");
 
     // Unreachable code.
     die();

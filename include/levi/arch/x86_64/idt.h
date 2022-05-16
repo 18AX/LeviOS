@@ -5,6 +5,7 @@
 #include <levi/types.h>
 
 #define INTERRUPT_GATE 0x8E
+#define ALLOW_TO_USER 0x60
 #define TRAP_GATE 0xF
 
 struct idt_64_entry

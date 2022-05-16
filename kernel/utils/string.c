@@ -78,6 +78,20 @@ char *strncpy(char *destination, const char *source, u64 num)
     return ptr;
 }
 
+char *strcpy(char *destination, const char *source)
+{
+    u32 i = 0;
+
+    for (; source[i] != '\0'; ++i)
+    {
+        destination[i] = source[i];
+    }
+
+    destination[i] = '\0';
+
+    return destination;
+}
+
 s32 strcmp(const char *s1, const char *s2)
 {
     while (*s1 && (*s1 == *s2))

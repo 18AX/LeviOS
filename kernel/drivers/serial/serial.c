@@ -9,16 +9,16 @@ static file_t *__open(const char *name, u32 flags);
 static s32 __write(file_t *file, u8 *buffer, u32 size);
 static void __destroy_file(file_t *file);
 
-struct vfs_operation serial_operation = { .mkdir = NULL,
-                                          .rmdir = NULL,
-                                          .rename = NULL,
+static struct vfs_operation serial_operation = { .mkdir = NULL,
+                                                 .rmdir = NULL,
+                                                 .rename = NULL,
 
-                                          .open = __open,
-                                          .write = __write,
-                                          .destroy_file = __destroy_file,
-                                          .flush = NULL,
-                                          .read = NULL,
-                                          .lseek = NULL };
+                                                 .open = __open,
+                                                 .write = __write,
+                                                 .destroy_file = __destroy_file,
+                                                 .flush = NULL,
+                                                 .read = NULL,
+                                                 .lseek = NULL };
 
 static vfs serial_vfs = { .name = "serial",
                           .flags = 0x0,
