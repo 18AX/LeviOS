@@ -12,6 +12,7 @@
 static struct idt_64_entry idt_entries[0xFF] = { 0 };
 static struct idt_64_ptr idt_ptr = { sizeof(idt_entries), (u64)idt_entries };
 
+#if 0
 static const char exceptions_message[32][32] = {
     "Divide-by-zero Error",
     "Debug",
@@ -46,6 +47,7 @@ static const char exceptions_message[32][32] = {
     "Reserved",
     "Reserved"
 };
+#endif
 
 static void set_entry(u32 index, u64 address, u16 selector, u8 ist,
                       u8 type_attr)
@@ -71,6 +73,10 @@ void interrupts_enable()
 
 static void handle_exception(u64 index, u64 error_code, proc_t *proc)
 {
+    (void)index;
+    (void)error_code;
+    (void)proc;
+#if 0
     term_print("PANIC: %s\n", exceptions_message[index]);
 
     term_print("error code %lx saved rip: 0x%lx cs: %lx\n", error_code,
@@ -98,6 +104,7 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
     default:
         break;
     }
+#endif
     die();
 }
 

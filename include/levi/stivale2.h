@@ -5,6 +5,9 @@
 
 #include "levi/types.h"
 
+#define POINTER_HHDM (1 << 1)
+#define FULL_VIRTUAL_KERNEL (1 << 3)
+
 // Anchor for non ELF kernels
 struct stivale2_anchor
 {
@@ -312,10 +315,5 @@ struct stivale2_struct_vmap
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, u64 id);
 
 STATUS term_init(struct stivale2_struct *stivale2_struct);
-
-/**
- * This should be only used at early stages
- */
-s32 term_print(const char *fmt, ...);
 
 #endif

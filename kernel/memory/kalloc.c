@@ -38,37 +38,13 @@ int liballoc_unlock()
 
 void *liballoc_alloc(u64 pages)
 {
-    void *physical = kframe_alloc(pages);
-
-    if (physical == NULL)
-    {
-        return NULL;
-    }
-
-    vas_t vas = kvas();
-
-    u64 p = KERNEL_HEAP + ((u64)physical);
-
-    if (vmmap_range(&vas, (u64)physical, p, PAGE_SIZE * pages, VM_READ_WRITE)
-        == MAP_FAILED)
-    {
-        return NULL;
-    }
-
-    return (void *)p;
+    return kframe_alloc(pages);
+    ;
 }
 
 int liballoc_free(void *ptr, u64 pages)
 {
-    void *page = (void *)(((u64)ptr) - KERNEL_HEAP);
-    kframe_free(page, pages);
-
-    vas_t vas = kvas();
-
-    if (vmunmap_range(&vas, (u64)ptr, PAGE_SIZE * pages) == FAILED)
-    {
-        return 1;
-    }
+    kframe_free(ptr, pages);
 
     return 0;
 }
@@ -191,6 +167,7 @@ static void *liballoc_memcpy(void *s1, const void *s2, u64 n)
     return s1;
 }
 
+#if 0
 void liballoc_dump()
 {
     struct liballoc_major *maj = l_memRoot;
@@ -218,6 +195,8 @@ void liballoc_dump()
         maj = maj->next;
     }
 }
+
+#endif
 
 // ***************************************************************
 

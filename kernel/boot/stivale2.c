@@ -7,26 +7,13 @@ static u8 stack[1048576]; // 1 Mib
 
 // this come frome https://wiki.osdev.org/Stivale_Bare_Bones
 
-static struct stivale2_header_tag_terminal terminal_hdr_tag = {
-    // All tags need to begin with an identifier and a pointer to the next tag.
-    .tag = {
-        // Identification constant defined in stivale2.h and the specification.
-        .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
-        // If next is 0, it marks the end of the linked list of header tags.
-        .next = 0
-    },
-    // The terminal header tag possesses a flags field, leave it as 0 for now
-    // as it is unused.
-    .flags = 0
-};
-
 static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     // Same as above.
     .tag = { .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
              // Instead of 0, we now point to the previous header tag. The order
              // in
              // which header tags are linked does not matter.
-             .next = (u64)&terminal_hdr_tag },
+             .next = NULL },
     // We set all the framebuffer specifics to 0 as we want the bootloader
     // to pick the best it can.
     .framebuffer_width = 0,
@@ -46,7 +33,7 @@ __attribute__((section(".stivale2hdr"),
     .stack = (u64)(stack + sizeof(stack)),
     // Bit 1, if set, causes the bootloader to return to us pointers in the
     // higher half, which we likely want.
-    .flags = 0, //(1 << 1),
+    .flags = POINTER_HHDM | FULL_VIRTUAL_KERNEL, //(1 << 1),
     // This header structure is the root of the linked list of header tags and
     // points to the first one in the linked list.
     .tags = (u64)&framebuffer_hdr_tag
@@ -91,19 +78,4 @@ STATUS term_init(struct stivale2_struct *stivale2_struct)
     term_write = (void *)term_str_tag->term_write;
 
     return SUCCESS;
-}
-
-s32 term_print(const char *fmt, ...)
-{
-    char printf_buf[1024];
-    va_list args;
-    s32 printed;
-
-    va_start(args, fmt);
-    printed = vsprintf(printf_buf, fmt, args);
-    va_end(args);
-
-    term_write(printf_buf, strlen(printf_buf));
-
-    return printed;
 }

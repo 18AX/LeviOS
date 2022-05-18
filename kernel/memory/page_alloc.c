@@ -1,6 +1,5 @@
-#include "levi/memory/page_alloc.h"
-
-#include "levi/memory/memory.h"
+#include <levi/memory/memory.h>
+#include <levi/memory/page_alloc.h>
 
 static struct free_list *free_list_entry = NULL;
 
@@ -44,7 +43,8 @@ STATUS kframe_init(struct stivale2_struct *boot_info)
                 continue;
             }
 
-            struct free_list *mem_zone = (struct free_list *)base_address;
+            struct free_list *mem_zone =
+                (struct free_list *)phys_to_hhdm(base_address);
 
             mem_zone->size = max_page;
             mem_zone->next = NULL;
@@ -184,6 +184,7 @@ void kframe_free(void *ptr, u64 pages)
     }
 }
 
+#if 0
 void kframe_dump(void)
 {
     struct free_list *current = free_list_entry;
@@ -201,3 +202,4 @@ void kframe_dump(void)
     term_print("---------------------------------------------------------------"
                "----\n");
 }
+#endif

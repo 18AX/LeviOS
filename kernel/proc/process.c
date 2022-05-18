@@ -15,6 +15,7 @@ proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas)
     }
 
     strncpy(proc->name, name, PROCESS_NAME_LEN);
+
     proc->flags = PROCESS_KERNEL;
 
     proc->vas = *vas;

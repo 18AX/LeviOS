@@ -1,7 +1,5 @@
-#include "levi/arch/x86_64/pic.h"
-
-#include "levi/arch/x86_64/io.h"
-#include "levi/stivale2.h"
+#include <levi/arch/x86_64/io.h>
+#include <levi/arch/x86_64/pic.h>
 
 void pic_init()
 {
@@ -42,10 +40,7 @@ void pic_set_irq(u8 pic, u8 irq, u8 state)
 
     u8 val = inb(pic);
 
-    term_print("%x\n", val);
-
     val = (val & ~(0x1 << irq)) | (state << irq);
 
-    term_print("%x\n", val);
     outb(pic, val);
 }

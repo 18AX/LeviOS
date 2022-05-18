@@ -50,21 +50,13 @@ static struct acpi_sdt_header *__xsdt_find(const char sig[4])
 
 static struct acpi_sdt_header *__rsdt_find(const char sig[4])
 {
-    term_print("rsdt ptr %p\n", rsdt);
-
     u64 rsdt_len =
         (rsdt->header.len - sizeof(struct acpi_sdt_header)) / sizeof(u32);
 
-    term_print("rsdt len %ld\n", rsdt_len);
-
-    term_print("rsdt array %p\n", rsdt->rsdt_table);
     for (u64 i = 0; i < rsdt_len; ++i)
     {
         struct acpi_sdt_header *h =
             (struct acpi_sdt_header *)((u64)rsdt->rsdt_table[i]);
-
-        term_print("sdt header: %p\n", h);
-        term_print("Sig: %.4s\n", h->signature);
 
         if (strncmp(sig, h->signature, 4) == 0)
         {

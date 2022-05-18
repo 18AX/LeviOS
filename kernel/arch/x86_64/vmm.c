@@ -6,7 +6,9 @@
 
 STATUS switch_vas(vas_t *vas)
 {
-    asm volatile("movq %0,%%cr3\n" ::"a"((u64)vas->data));
+    u64 addr = hhdm_to_phys((u64)vas->data);
+
+    asm volatile("movq %0,%%cr3\n" ::"a"(addr));
 
     return SUCCESS;
 }
@@ -17,7 +19,7 @@ vas_t get_vas(void)
 
     asm volatile("movq %%cr3,%0" : "=r"(value));
 
-    return (vas_t){ (struct pml_entry *)value };
+    return (vas_t){ (struct pml_entry *)phys_to_hhdm(value) };
 }
 
 static struct pml_entry *init_pml(void)
@@ -56,7 +58,8 @@ static struct pml_entry *find_or_allocate_pml(struct pml_entry *pml, u64 idx,
 {
     if (pml[idx].present == 1)
     {
-        return (struct pml_entry *)(LSHIFT((u64)pml[idx].page_table_addr, 12));
+        return (struct pml_entry *)(phys_to_hhdm(
+            LSHIFT((u64)pml[idx].page_table_addr, 12)));
     }
 
     struct pml_entry *n_pml = init_pml();
@@ -66,7 +69,7 @@ static struct pml_entry *find_or_allocate_pml(struct pml_entry *pml, u64 idx,
         return NULL;
     }
 
-    pml[idx].raw = flags | (((u64)n_pml) & ~(0xFFF));
+    pml[idx].raw = flags | ((hhdm_to_phys((u64)n_pml)) & ~(0xFFF));
 
     return n_pml;
 }
@@ -88,24 +91,24 @@ static struct pml_entry *find_page(vas_t *vm, u64 virt)
         return NULL;
     }
 
-    struct pml_entry *pdpt =
-        (struct pml_entry *)LSHIFT((u64)pml4[pml3_idx].page_table_addr, 12);
+    struct pml_entry *pdpt = (struct pml_entry *)phys_to_hhdm(
+        LSHIFT((u64)pml4[pml3_idx].page_table_addr, 12));
 
     if (pdpt[pml2_idx].present == 0)
     {
         return NULL;
     }
 
-    struct pml_entry *pd =
-        (struct pml_entry *)LSHIFT((u64)pdpt[pml2_idx].page_table_addr, 12);
+    struct pml_entry *pd = (struct pml_entry *)phys_to_hhdm(
+        LSHIFT((u64)pdpt[pml2_idx].page_table_addr, 12));
 
     if (pd[pml1_idx].present == 0)
     {
         return NULL;
     }
 
-    struct pml_entry *pt =
-        (struct pml_entry *)LSHIFT((u64)pd[pml1_idx].page_table_addr, 12);
+    struct pml_entry *pt = (struct pml_entry *)phys_to_hhdm(
+        LSHIFT((u64)pd[pml1_idx].page_table_addr, 12));
 
     return &pt[pml0_idx];
 }
@@ -235,8 +238,8 @@ static void destroy_vas_rec(struct pml_entry *entry)
 
     for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
     {
-        destroy_vas_rec(
-            (struct pml_entry *)((u64)LSHIFT(entry[i].page_table_addr, 12)));
+        destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
+            (u64)LSHIFT(entry[i].page_table_addr, 12))));
     }
 
     kframe_free(entry, 1);

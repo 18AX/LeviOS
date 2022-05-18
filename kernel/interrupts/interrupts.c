@@ -5,8 +5,9 @@
 
 static void default_handler(u64 id, u64 error_code, proc_t *proc)
 {
-    term_print("isr: %lu error_code: %lu rdi: %lu\n", id, error_code,
-               proc->ctx.regs.rdi);
+    (void)id;
+    (void)error_code;
+    (void)proc;
 
     if (id < 30)
     {
