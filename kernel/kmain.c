@@ -4,6 +4,7 @@
 #include <levi/fs/file.h>
 #include <levi/fs/fs.h>
 #include <levi/fs/memfs.h>
+#include <levi/init.h>
 #include <levi/interrupts/interrupts.h>
 #include <levi/memory/memory.h>
 #include <levi/memory/page_alloc.h>
@@ -57,8 +58,7 @@ static STATUS early_init(struct stivale2_struct *boot_info)
 
     term_print("Arch intialized\n");
 
-    proc_t *kernel_proc =
-        process_create("Levi", NULL, &kernel_vas, PROCESS_KERNEL);
+    proc_t *kernel_proc = proc_kernel("Kernel", &kernel_vas);
 
     if (kernel_proc == NULL)
     {
@@ -94,6 +94,8 @@ static STATUS init(struct stivale2_struct *boot_info)
 
     term_print("Drivers initialized\n");
 
+    kbd_init();
+
     u32 nbr_modules = module_init(boot_info);
 
     term_print("%u modules loaded\n", nbr_modules);
@@ -116,6 +118,20 @@ void main(struct stivale2_struct *boot_info)
     }
 
     interrupts_enable();
+
+    for (;;)
+    {
+        u64 key = get_kbd_state();
+        term_print("\rkeystate %lx", key);
+        asm volatile("hlt");
+    }
+
+    term_print("Run init\n");
+
+    if (run_init(boot_info) == FAILED)
+    {
+        term_print("Failed to run init program\n");
+    }
 
     // Unreachable code.
     die();

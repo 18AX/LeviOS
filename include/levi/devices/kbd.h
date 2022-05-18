@@ -49,6 +49,6 @@ void on_key_release(enum keycode key);
 
 u32 key_state(enum keycode key);
 
-u64 get_state();
+u64 get_kbd_state();
 
 #endif

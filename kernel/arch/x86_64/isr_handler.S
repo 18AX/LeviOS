@@ -21,6 +21,7 @@ isr_\nb:
 
 isr_handler:
     cld
+    pushq %rbp
     pushq %r15
     pushq %r14
     pushq %r13
@@ -53,6 +54,7 @@ isr_handler:
     popq %r13
     popq %r14
     popq %r15
+    popq %rbp
 
     add $0x10,%rsp
 

@@ -11,22 +11,32 @@
 #define FD_TABLE_LEN 128
 
 #define PROCESS_KERNEL 0x1
-#define PROCESS_SHARED_VAS 0x2
 
 typedef struct process
 {
     u32 id;
     char name[PROCESS_NAME_LEN];
-    struct process *parent;
     vas_t vas;
     file_t *fds[FD_TABLE_LEN];
+    u32 flags;
     context_t ctx;
 } proc_t;
 
-proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
-                       vas_t *vas, u32 flags);
+proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags);
 
-void process_delete(proc_t *proc);
+/**
+ * @brief Allocate n pages for the stack process.
+ *
+ * @param proc
+ * @param address
+ * @param nb_page
+ * @return STATUS
+ */
+STATUS proc_allocate_stack(proc_t *proc, u64 address, u64 nb_page);
+
+proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas);
+
+void proc_delete(proc_t *proc);
 
 proc_t *proc_get(u32 id);
 

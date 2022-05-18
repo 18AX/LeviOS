@@ -24,6 +24,7 @@ typedef struct registers
     u64 r13;
     u64 r14;
     u64 r15;
+    u64 rbp;
 } __attribute__((packed)) regs_t;
 
 typedef struct context
@@ -33,6 +34,9 @@ typedef struct context
     u64 error_code;
     u64 rip;
     u64 cs;
+    u64 eflags;
+    u64 rsp;
+    u64 ss;
 } __attribute__((packed)) context_t;
 
 #endif

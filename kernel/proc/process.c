@@ -1,12 +1,11 @@
-#include "levi/proc/process.h"
-
-#include "levi/memory/memory.h"
-#include "levi/utils/string.h"
+#include <levi/memory/memory.h>
+#include <levi/memory/page_alloc.h>
+#include <levi/proc/process.h>
+#include <levi/utils/string.h>
 
 static proc_t *proc_list[MAX_PROCESS] = { NULL };
 
-proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
-                       vas_t *vas, u32 flags)
+proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas)
 {
     proc_t *proc = kmalloc(sizeof(proc_t));
 
@@ -15,55 +14,74 @@ proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
         return NULL;
     }
 
-    u64 len = strlen(name);
+    strncpy(proc->name, name, PROCESS_NAME_LEN);
+    proc->flags = PROCESS_KERNEL;
 
-    if (len >= PROCESS_NAME_LEN)
+    proc->vas = *vas;
+
+    /** Intialize files descriptors array **/
+
+    for (u32 i = 0; i < FD_TABLE_LEN; ++i)
     {
-        kfree(proc);
+        proc->fds[i] = NULL;
+    }
+
+    proc_list[0] = proc;
+
+    return proc;
+}
+
+proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
+{
+    proc_t *proc = kmalloc(sizeof(proc_t));
+
+    if (proc == NULL)
+    {
         return NULL;
     }
 
-    memcpy(proc->name, name, len);
+    STATUS found = FAILED;
 
-    proc->parent = parent;
-
-    // We need to initalize a new vas
-    if (vas == NULL)
+    /** The first entry is reserved for the kernel process **/
+    for (u32 i = 1; i < MAX_PROCESS; ++i)
     {
-        if (fill_empty_vas(&proc->vas) == FAILED)
+        if (proc_list[i] != NULL)
         {
-            kfree(proc);
-        }
-
-        // We copy the vas of the parent
-        if (parent != NULL && (flags & PROCESS_SHARED_VAS) != 0)
-        {
-            vascpy(&proc->vas, &parent->vas);
-        }
-    }
-    else
-    {
-        proc->vas = *vas;
-    }
-
-    u32 found_id = 0;
-
-    for (u64 i = 0; i < MAX_PROCESS; ++i)
-    {
-        if (proc_list[i] == NULL)
-        {
-            proc->id = i;
             proc_list[i] = proc;
-            found_id = 1;
+            found = SUCCESS;
             break;
         }
     }
 
-    if (found_id == 0)
+    if (found == FAILED)
     {
         kfree(proc);
         return NULL;
     }
+
+    strncpy(proc->name, name, PROCESS_NAME_LEN);
+    proc->flags = flags;
+
+    /** Initialize process virtual address space **/
+    if (fill_empty_vas(&proc->vas) == FAILED)
+    {
+        kfree(proc);
+        return NULL;
+    }
+
+    /** We need to copy kernel vas **/
+
+    proc_t *kernel_proc = proc_get(0);
+
+    if (kernel_proc == NULL)
+    {
+        kfree(proc);
+        return NULL;
+    }
+
+    vascpy(&proc->vas, &kernel_proc->vas);
+
+    /** Intialize files descriptors array **/
 
     for (u32 i = 0; i < FD_TABLE_LEN; ++i)
     {
@@ -71,6 +89,43 @@ proc_t *process_create(const char name[PROCESS_NAME_LEN], proc_t *parent,
     }
 
     return proc;
+}
+
+STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
+{
+    if (proc == NULL)
+    {
+        return FAILED;
+    }
+
+    u64 addr = (u64)kframe_alloc(nb_page);
+
+    if (addr == NULL)
+    {
+        return NULL;
+    }
+
+    u32 vmmap_flags = VM_READ_WRITE;
+
+    if ((proc->flags & PROCESS_KERNEL) == 0)
+    {
+        vmmap_flags |= VM_USER;
+    }
+
+    if (vmmap_range(&proc->vas, addr, virt_address, PAGE_SIZE * nb_page,
+                    vmmap_flags)
+        == MAP_FAILED)
+    {
+        kframe_free((void *)addr, nb_page);
+    }
+
+    /** Update stacks registers **/
+#if x86_64
+    proc->ctx.rsp = virt_address;
+    proc->ctx.regs.rbp = virt_address;
+#endif
+
+    return SUCCESS;
 }
 
 void process_delete(proc_t *proc)

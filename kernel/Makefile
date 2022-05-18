@@ -28,7 +28,10 @@ KERNEL_OBJ= kmain.c.o \
 	devices/kbd.c.o \
 	devices/kbd/intel8042.c.o \
 	syscall/syscall.c.o \
+	syscall/exec.c.o \
 	modules/module.c.o \
+	init.c.o \
+
 
 # x86_64
 

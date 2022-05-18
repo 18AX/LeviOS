@@ -26,7 +26,7 @@ u32 key_state(enum keycode key)
     return ((key_state_mask & (1 << key)) != 0) ? KEY_PRESS : KEY_RELEASE;
 }
 
-u64 get_state()
+u64 get_kbd_state()
 {
     return key_state_mask;
 }

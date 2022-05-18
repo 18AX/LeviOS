@@ -1,7 +1,6 @@
 #include <levi/fs/fs.h>
 #include <levi/fs/memfs.h>
 #include <levi/memory/memory.h>
-#include <levi/stivale2.h>
 #include <levi/utils/string.h>
 #include <levi/utils/stringmap.h>
 
@@ -28,20 +27,14 @@ static map_t memfiles_map = NULL;
 
 STATUS memfs_init(void)
 {
-    term_print("TOTO\n");
-
     memfiles_map = hashmap_new();
-
-    term_print("TATA\n");
 
     if (memfiles_map == NULL)
     {
         return FAILED;
     }
 
-    term_print("Register fs\n");
     STATUS res = register_fs(&memfs);
-    term_print("FOOO\n");
 
     return res;
 }
