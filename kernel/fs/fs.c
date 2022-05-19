@@ -66,7 +66,7 @@ file_t *open_file(const char *path, u32 flags)
         return NULL;
     }
 
-    if (vfs->operation == NULL)
+    if (vfs->operation == NULL || vfs->operation->open == NULL)
     {
         kfree(key);
         kfree(value);

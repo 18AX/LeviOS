@@ -25,6 +25,7 @@ KERNEL_OBJ= kmain.c.o \
 	utils/stringmap.c.o \
 	drivers/drivers.c.o \
 	drivers/serial/serial.c.o \
+	drivers/framebuffer/framebuffer.c.o \
 	devices/kbd.c.o \
 	devices/kbd/intel8042.c.o \
 	syscall/syscall.c.o \

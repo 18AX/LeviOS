@@ -64,7 +64,7 @@ static STATUS init(struct stivale2_struct *boot_info)
         return FAILED;
     }
 
-    if (drivers_init() == FAILED)
+    if (drivers_init(boot_info) == FAILED)
     {
         return FAILED;
     }

@@ -50,6 +50,12 @@ static file_t *__open(const char *name, u32 flags)
                     // fifo (bit 0)
 
         file_t *file = kmalloc(sizeof(file_t));
+
+        if (file == NULL)
+        {
+            return NULL;
+        }
+
         file->data = (void *)COM1;
 
         return file;

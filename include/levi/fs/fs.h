@@ -6,6 +6,10 @@
 #define FS_READ 0x0
 #define FS_WRITE 0x1
 
+#define FS_SEEK_SET 0
+#define FS_SEEK_CUR 1
+#define FS_SEEK_END 2
+
 typedef struct file
 {
     u32 flags;

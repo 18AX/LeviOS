@@ -35,6 +35,12 @@ STATUS close(s32 fd, proc_t *process)
 
     file_t *f = process->fds[fd];
 
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->destroy_file == NULL)
+    {
+        return FAILED;
+    }
+
     f->open_count -= 1;
 
     if (f->open_count == 0)
@@ -88,6 +94,42 @@ s32 read(s32 fd, void *buffer, u32 size, proc_t *process)
     return f->vfs->operation->read(f, (u8 *)buffer, size);
 }
 
+s32 flush(s32 fd, proc_t *process)
+{
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    {
+        return -1;
+    }
+
+    file_t *f = process->fds[fd];
+
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->flush == NULL)
+    {
+        return -1;
+    }
+
+    return f->vfs->operation->flush(f);
+}
+
+s32 lseek(s32 fd, u64 offset, u32 whence, proc_t *process)
+{
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    {
+        return -1;
+    }
+
+    file_t *f = process->fds[fd];
+
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->lseek == NULL)
+    {
+        return -1;
+    }
+
+    return f->vfs->operation->lseek(f, offset, whence);
+}
+
 s32 kopen(const char *pathname, u32 flags)
 {
     proc_t *kern_proc = proc_get(0);
@@ -114,4 +156,18 @@ s32 kread(u32 fd, void *buffer, u32 size)
     proc_t *kern_proc = proc_get(0);
 
     return read(fd, buffer, size, kern_proc);
+}
+
+s32 kflush(u32 fd)
+{
+    proc_t *kern_proc = proc_get(0);
+
+    return flush(fd, kern_proc);
+}
+
+s32 klseek(s32 fd, u64 offset, u32 whence)
+{
+    proc_t *kern_proc = proc_get(0);
+
+    return lseek(fd, offset, whence, kern_proc);
 }
