@@ -10,7 +10,8 @@ s32 open(const char *pathname, u32 flags, proc_t *process)
         return -1;
     }
 
-    for (u32 i = 0; i < FD_TABLE_LEN; ++i)
+    /** The first 3 fd are reserved for stdout, stdint and stderr **/
+    for (u32 i = 3; i < FD_TABLE_LEN; ++i)
     {
         if (process->fds[i] == NULL)
         {
@@ -130,6 +131,28 @@ s32 lseek(s32 fd, u64 offset, u32 whence, proc_t *process)
     return f->vfs->operation->lseek(f, offset, whence);
 }
 
+s32 dup2(s32 oldfd, s32 newfd, proc_t *process)
+{
+    if (oldfd < 0 || oldfd >= FD_TABLE_LEN || newfd < 0 || newfd >= FD_TABLE_LEN
+        || process->fds[oldfd] == NULL)
+    {
+        return -1;
+    }
+
+    if (process->fds[newfd] != NULL)
+    {
+        close(newfd, process);
+    }
+
+    file_t *file = process->fds[oldfd];
+
+    file->open_count += 1;
+
+    process->fds[newfd] = file;
+
+    return newfd;
+}
+
 s32 kopen(const char *pathname, u32 flags)
 {
     proc_t *kern_proc = proc_get(0);
@@ -170,4 +193,11 @@ s32 klseek(s32 fd, u64 offset, u32 whence)
     proc_t *kern_proc = proc_get(0);
 
     return lseek(fd, offset, whence, kern_proc);
+}
+
+s32 kdup2(s32 oldfd, s32 newfd)
+{
+    proc_t *kern_proc = proc_get(0);
+
+    return dup2(oldfd, newfd, kern_proc);
 }

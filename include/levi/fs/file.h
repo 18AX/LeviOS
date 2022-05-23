@@ -4,6 +4,10 @@
 #include <levi/proc/process.h>
 #include <levi/types.h>
 
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+
 s32 open(const char *pathname, u32 flags, proc_t *process);
 
 STATUS close(s32 fd, proc_t *prcess);
@@ -16,6 +20,8 @@ s32 flush(s32 fd, proc_t *process);
 
 s32 lseek(s32 fd, u64 offset, u32 whence, proc_t *process);
 
+s32 dup2(s32 oldfd, s32 newfd, proc_t *process);
+
 s32 kopen(const char *pathname, u32 flags);
 
 STATUS kclose(s32 fd);
@@ -27,5 +33,7 @@ s32 kread(u32 fd, void *buffer, u32 size);
 s32 kflush(u32 fd);
 
 s32 klseek(s32 fd, u64 offset, u32 whence);
+
+s32 kdup2(s32 oldfd, s32 newfd);
 
 #endif

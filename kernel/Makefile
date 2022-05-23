@@ -14,6 +14,7 @@ KERNEL_OBJ= kmain.c.o \
 	utils/string.c.o \
 	utils/stdio.c.o \
 	utils/list.c.o \
+	utils/kprintf.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \

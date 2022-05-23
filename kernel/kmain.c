@@ -15,6 +15,7 @@
 #include <levi/proc/scheduler.h>
 #include <levi/stivale2.h>
 #include <levi/types.h>
+#include <levi/utils/kprintf.h>
 
 static STATUS early_init(struct stivale2_struct *boot_info)
 {
@@ -48,6 +49,30 @@ static STATUS early_init(struct stivale2_struct *boot_info)
     }
 
     sched_set(kernel_proc->id);
+
+    return SUCCESS;
+}
+
+static STATUS init_kernel_io()
+{
+    int fd = kopen("console:", FS_READ | FS_WRITE);
+
+    if (fd < 0)
+    {
+        return FAILED;
+    }
+
+    if (kdup2(fd, STDOUT_FILENO) < 0)
+    {
+        return FAILED;
+    }
+
+    if (kdup2(fd, STDERR_FILENO) < 0)
+    {
+        return FAILED;
+    }
+
+    kclose(fd);
 
     return SUCCESS;
 }
@@ -88,20 +113,16 @@ void main(struct stivale2_struct *boot_info)
         die();
     }
 
+    if (init_kernel_io() == FAILED)
+    {
+        die();
+    }
+
+    kprintf("^gHello World\n");
+
     interrupts_enable();
 
     run_init(boot_info);
-
-    int fd = kopen("console:", FS_READ | FS_WRITE);
-
-    char hello[] =
-        "Hello World!\nshould be print on a new line\nheyho\nthis is ^rred "
-        "^bblue ^\n^1234^puoupi^ctada ^mmagenta\n^ggreen ^yyellow ^wwhite "
-        "^oorange";
-
-    kwrite(fd, hello, sizeof(hello));
-
-    kflush(fd);
 
     asm volatile("xchgw %bx, %bx");
 
