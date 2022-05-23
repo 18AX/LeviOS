@@ -96,7 +96,8 @@ void main(struct stivale2_struct *boot_info)
 
     char hello[] =
         "Hello World!\nshould be print on a new line\nheyho\nthis is ^rred "
-        "^bblue ^\n^1234^puoupi^ctada ^mmagenta\n^ggreen ^yyellow ^wwhite";
+        "^bblue ^\n^1234^puoupi^ctada ^mmagenta\n^ggreen ^yyellow ^wwhite "
+        "^oorange";
 
     kwrite(fd, hello, sizeof(hello));
 

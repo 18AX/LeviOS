@@ -208,6 +208,10 @@ static u32 console_write_line(u32 index, void *line)
                 color = framebuffer_pixel_color((struct framebuffer_color){
                     .r = 0xFF, .g = 0xFF, .b = 0x0 });
                 break;
+            case 'o':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0xFF, .g = 0xA5, .b = 0x0 });
+                break;
             case 'w':
                 color = framebuffer_pixel_color((struct framebuffer_color){
                     .r = 0xFF, .g = 0xFF, .b = 0xFF });
