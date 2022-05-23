@@ -62,6 +62,34 @@ STATUS framebuffer_init(struct stivale2_struct *boot_info)
     return register_fs(&framebuffer_vfs);
 }
 
+STATUS framebuffer_get_info(struct framebuffer_info *info)
+{
+    /** Framebuffer driver have not been initialized **/
+    if (video_buffer == NULL)
+    {
+        return FAILED;
+    }
+
+    info->width = framebuffer_info.framebuffer_width;
+    info->height = framebuffer_info.framebuffer_height;
+    info->pitch = framebuffer_info.framebuffer_pitch;
+    info->bpp = framebuffer_info.framebuffer_bpp;
+    info->red_mask_shift = framebuffer_info.red_mask_shift;
+    info->red_mask_size = framebuffer_info.red_mask_size;
+    info->green_mask_shift = framebuffer_info.green_mask_shift;
+    info->green_mask_size = framebuffer_info.green_mask_size;
+    info->blue_mask_shift = framebuffer_info.blue_mask_shift;
+    info->blue_mask_size = framebuffer_info.blue_mask_size;
+
+    return SUCCESS;
+}
+
+u32 framebuffer_pixel_offset(u32 x, u32 y)
+{
+    return y * framebuffer_info.framebuffer_pitch
+        + (x * (framebuffer_info.framebuffer_bpp / 8));
+}
+
 static file_t *__open(const char *name, u32 flags)
 {
     (void)name; // We dont care about the name;

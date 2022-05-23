@@ -133,3 +133,70 @@ STATUS split(const char *str, char delimiter, char *output[])
 
     return SUCCESS;
 }
+
+char *strdup(const char *str)
+{
+    u32 len = strlen(str);
+
+    char *cpy = kmalloc(sizeof(char) * (len + 1));
+
+    if (cpy == NULL)
+    {
+        return NULL;
+    }
+
+    strcpy(cpy, str);
+    cpy[len] = '\n';
+
+    return cpy;
+}
+
+char *strndup(const char *str, u32 n)
+{
+    u32 cpy_len = n;
+    u32 len = strlen(str);
+
+    if (cpy_len > len)
+    {
+        cpy_len = len;
+    }
+
+    char *cpy = kmalloc(sizeof(char) * (cpy_len + 1));
+
+    if (cpy == NULL)
+    {
+        return NULL;
+    }
+
+    strncpy(cpy, str, cpy_len);
+
+    cpy[cpy_len] = '\n';
+
+    return cpy;
+}
+
+char *strchr(char *str, char c)
+{
+    for (u32 i = 0; str[i] != '\0'; ++i)
+    {
+        if (str[i] == c)
+        {
+            return str + i;
+        }
+    }
+
+    return NULL;
+}
+
+s32 charindex(const char *str, char c)
+{
+    for (u32 i = 0; str[i] != '\0'; ++i)
+    {
+        if (str[i] == c)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}

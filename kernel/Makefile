@@ -13,6 +13,7 @@ KERNEL_OBJ= kmain.c.o \
 	boot/stivale2.c.o \
 	utils/string.c.o \
 	utils/stdio.c.o \
+	utils/list.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \
@@ -26,6 +27,7 @@ KERNEL_OBJ= kmain.c.o \
 	drivers/drivers.c.o \
 	drivers/serial/serial.c.o \
 	drivers/framebuffer/framebuffer.c.o \
+	drivers/console/console.c.o \
 	devices/kbd.c.o \
 	devices/kbd/intel8042.c.o \
 	syscall/syscall.c.o \

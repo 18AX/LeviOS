@@ -92,6 +92,14 @@ void main(struct stivale2_struct *boot_info)
 
     run_init(boot_info);
 
+    int fd = kopen("console:", FS_READ | FS_WRITE);
+
+    char hello[] = "Hello World!\nshould be print on a new line\nheyho";
+
+    kwrite(fd, hello, sizeof(hello));
+
+    kflush(fd);
+
     asm volatile("xchgw %bx, %bx");
 
     // Unreachable code.
