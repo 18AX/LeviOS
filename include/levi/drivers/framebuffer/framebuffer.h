@@ -18,11 +18,20 @@ struct framebuffer_info
     u8 blue_mask_shift;
 };
 
+struct framebuffer_color
+{
+    u32 r;
+    u32 g;
+    u32 b;
+};
+
 STATUS
 framebuffer_init(struct stivale2_struct *boot_info);
 
 STATUS framebuffer_get_info(struct framebuffer_info *info);
 
 u32 framebuffer_pixel_offset(u32 x, u32 y);
+
+u32 framebuffer_pixel_color(struct framebuffer_color color);
 
 #endif

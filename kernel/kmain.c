@@ -94,7 +94,9 @@ void main(struct stivale2_struct *boot_info)
 
     int fd = kopen("console:", FS_READ | FS_WRITE);
 
-    char hello[] = "Hello World!\nshould be print on a new line\nheyho";
+    char hello[] =
+        "Hello World!\nshould be print on a new line\nheyho\nthis is ^rred "
+        "^bblue ^\n^1234^puoupi^ctada ^mmagenta\n^ggreen ^yyellow ^wwhite";
 
     kwrite(fd, hello, sizeof(hello));
 

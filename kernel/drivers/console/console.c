@@ -155,16 +155,81 @@ static u32 console_write_line(u32 index, void *line)
         return 0;
     }
 
-    u32 color = 0xFFFFFFFF;
+    u32 color = framebuffer_pixel_color(
+        (struct framebuffer_color){ .r = 0xFF, .g = 0xFF, .b = 0xFF });
     u32 y = LINE_HEIGH * (max_lines - index);
 
     char *char_line = (char *)line;
 
     u32 len = strlen(char_line);
 
-    for (u32 i = 0; i < len; ++i)
+    u32 select_color = 0;
+
+    u32 i = 0;
+    u32 char_cursor = 0;
+    while (i < len)
     {
-        write_char(i * CHAR_WIDTH, y, color, char_line[i]);
+        if (char_line[i] == '^')
+        {
+            select_color = 1;
+            ++i;
+            continue;
+        }
+
+        if (select_color == 1)
+        {
+            switch (char_line[i])
+            {
+            case 'r':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0xFF, .g = 0x0, .b = 0x0 });
+                break;
+            case 'b':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0x0, .g = 0x0, .b = 0xFF });
+                break;
+            case 'g':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0x0, .g = 0xFF, .b = 0x0 });
+                break;
+            case 'p':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0x80, .g = 0x0, .b = 0x80 });
+                break;
+            case 'c':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0x0, .g = 0xFF, .b = 0xFF });
+                break;
+            case 'm':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0xFF, .g = 0x0, .b = 0xFF });
+                break;
+            case 'y':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0xFF, .g = 0xFF, .b = 0x0 });
+                break;
+            case 'w':
+                color = framebuffer_pixel_color((struct framebuffer_color){
+                    .r = 0xFF, .g = 0xFF, .b = 0xFF });
+                break;
+            default:
+                write_char(char_cursor * CHAR_WIDTH, y, color, '^');
+                ++char_cursor;
+                write_char(char_cursor * CHAR_WIDTH, y, color, char_line[i]);
+                ++char_cursor;
+                break;
+            }
+            ++i;
+
+            select_color = 0;
+
+            continue;
+        }
+
+        write_char(char_cursor * CHAR_WIDTH, y, color, char_line[i]);
+
+        ++i;
+        ++char_cursor;
     }
 
     return 1;

@@ -84,6 +84,13 @@ STATUS framebuffer_get_info(struct framebuffer_info *info)
     return SUCCESS;
 }
 
+u32 framebuffer_pixel_color(struct framebuffer_color color)
+{
+    return ((color.r & 0xFF) << framebuffer_info.red_mask_shift)
+        | ((color.g & 0xFF) << framebuffer_info.green_mask_shift)
+        | ((color.b & 0xFF) << framebuffer_info.blue_mask_shift);
+}
+
 u32 framebuffer_pixel_offset(u32 x, u32 y)
 {
     return y * framebuffer_info.framebuffer_pitch
