@@ -118,7 +118,7 @@ void main(struct stivale2_struct *boot_info)
         die();
     }
 
-    kprintf("^gHello World\n");
+    kprintf("[^ginfo^w] Kernel initialized");
 
     interrupts_enable();
 

@@ -146,7 +146,7 @@ char *strdup(const char *str)
     }
 
     strcpy(cpy, str);
-    cpy[len] = '\n';
+    cpy[len] = '\0';
 
     return cpy;
 }
@@ -170,7 +170,7 @@ char *strndup(const char *str, u32 n)
 
     strncpy(cpy, str, cpy_len);
 
-    cpy[cpy_len] = '\n';
+    cpy[cpy_len] = '\0';
 
     return cpy;
 }
