@@ -310,19 +310,37 @@ int ksprintf(char *buf, const char *fmt, ...)
     return i;
 }
 
-int kprintf(const char *fmt, ...)
+int __kdprintf(s32 fd, const char *fmt, va_list args)
 {
     char printf_buf[1024];
-    va_list args;
     int printed;
 
-    va_start(args, fmt);
     printed = kvsprintf(printf_buf, fmt, args);
+
+    s32 written = kwrite(fd, (void *)printf_buf, printed);
+    kflush(fd);
+
+    return written;
+}
+
+int kdprintf(s32 fd, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    s32 written = __kdprintf(fd, fmt, args);
     va_end(args);
 
-    kputs(printf_buf);
+    return written;
+}
 
-    return printed;
+int kprintf(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    s32 written = __kdprintf(STDOUT_FILENO, fmt, args);
+    va_end(args);
+
+    return written;
 }
 
 int kputs(const char *s)

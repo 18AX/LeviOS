@@ -217,9 +217,11 @@ static u32 console_write_line(u32 index, void *line)
                     .r = 0xFF, .g = 0xFF, .b = 0xFF });
                 break;
             default:
-                write_char(char_cursor * CHAR_WIDTH, y, color, '^');
+                write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
+                           '^');
                 ++char_cursor;
-                write_char(char_cursor * CHAR_WIDTH, y, color, char_line[i]);
+                write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
+                           char_line[i]);
                 ++char_cursor;
                 break;
             }
@@ -230,7 +232,8 @@ static u32 console_write_line(u32 index, void *line)
             continue;
         }
 
-        write_char(char_cursor * CHAR_WIDTH, y, color, char_line[i]);
+        write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
+                   char_line[i]);
 
         ++i;
         ++char_cursor;
@@ -242,6 +245,8 @@ static u32 console_write_line(u32 index, void *line)
 static s32 __flush(file_t *file)
 {
     struct console_data *data = file->data;
+
+    framebuffer_reset();
 
     list_for_each_rev(data->lines, console_write_line);
 

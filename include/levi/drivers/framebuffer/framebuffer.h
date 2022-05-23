@@ -34,4 +34,6 @@ u32 framebuffer_pixel_offset(u32 x, u32 y);
 
 u32 framebuffer_pixel_color(struct framebuffer_color color);
 
+void framebuffer_reset(void);
+
 #endif

@@ -12,9 +12,9 @@ KERNEL_OBJ= kmain.c.o \
 	panic.c.o \
 	boot/stivale2.c.o \
 	utils/string.c.o \
-	utils/stdio.c.o \
 	utils/list.c.o \
 	utils/kprintf.c.o \
+	utils/kerr.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \

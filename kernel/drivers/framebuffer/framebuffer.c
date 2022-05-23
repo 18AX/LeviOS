@@ -97,6 +97,11 @@ u32 framebuffer_pixel_offset(u32 x, u32 y)
         + (x * (framebuffer_info.framebuffer_bpp / 8));
 }
 
+void framebuffer_reset(void)
+{
+    memset(video_buffer, 0x0, buffer_size);
+}
+
 static file_t *__open(const char *name, u32 flags)
 {
     (void)name; // We dont care about the name;
