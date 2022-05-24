@@ -7,7 +7,6 @@
 STATUS run_init(struct stivale2_struct *boot_info)
 {
     (void)boot_info;
-    asm volatile("xchgw %bx, %bx");
 
     s32 fd = kopen("memfs:init", FS_READ);
 

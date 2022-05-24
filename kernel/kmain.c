@@ -96,8 +96,6 @@ static STATUS init(struct stivale2_struct *boot_info)
 
     kbd_init();
 
-    module_init(boot_info);
-
     return SUCCESS;
 }
 
@@ -119,6 +117,10 @@ void main(struct stivale2_struct *boot_info)
     }
 
     kprintf("[^ginfo^w] Kernel initialized\n");
+
+    u32 module_loaded = module_init(boot_info);
+
+    kprintf("[^ginfo^w] %u modules loaded\n", module_loaded);
 
     interrupts_enable();
 
