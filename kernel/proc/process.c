@@ -1,6 +1,7 @@
 #include <levi/memory/memory.h>
 #include <levi/memory/page_alloc.h>
 #include <levi/proc/process.h>
+#include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
 
 static proc_t *proc_list[MAX_PROCESS] = { NULL };
@@ -46,9 +47,10 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     /** The first entry is reserved for the kernel process **/
     for (u32 i = 1; i < MAX_PROCESS; ++i)
     {
-        if (proc_list[i] != NULL)
+        if (proc_list[i] == NULL)
         {
             proc_list[i] = proc;
+            proc->id = i;
             found = SUCCESS;
             break;
         }
@@ -57,6 +59,7 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     if (found == FAILED)
     {
         kfree(proc);
+        kprintf("NOT FOUND\n");
         return NULL;
     }
 
@@ -66,6 +69,7 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     /** Initialize process virtual address space **/
     if (fill_empty_vas(&proc->vas) == FAILED)
     {
+        kprintf("FAILED to empty vas\n");
         kfree(proc);
         return NULL;
     }
@@ -76,6 +80,7 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
 
     if (kernel_proc == NULL)
     {
+        kprintf("KERNEL PROC NOT FOUND\n");
         kfree(proc);
         return NULL;
     }
@@ -106,6 +111,8 @@ STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
         return NULL;
     }
 
+    u64 phys_addr = hhdm_to_phys(addr);
+
     u32 vmmap_flags = VM_READ_WRITE;
 
     if ((proc->flags & PROCESS_KERNEL) == 0)
@@ -113,18 +120,12 @@ STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
         vmmap_flags |= VM_USER;
     }
 
-    if (vmmap_range(&proc->vas, addr, virt_address, PAGE_SIZE * nb_page,
+    if (vmmap_range(&proc->vas, phys_addr, virt_address, PAGE_SIZE * nb_page,
                     vmmap_flags)
         == MAP_FAILED)
     {
         kframe_free((void *)addr, nb_page);
     }
-
-    /** Update stacks registers **/
-#if x86_64
-    proc->ctx.rsp = virt_address;
-    proc->ctx.regs.rbp = virt_address;
-#endif
 
     return SUCCESS;
 }

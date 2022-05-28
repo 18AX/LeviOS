@@ -44,4 +44,6 @@ typedef struct context
 STATUS
 arch_init(struct stivale2_struct *boot_info);
 
+void arch_init_ctx(context_t *ctx, void *entry, void *stack, u8 is_kernel);
+
 #endif

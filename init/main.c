@@ -1,6 +1,6 @@
-int main(void)
+__attribute__((naked)) int main(void)
 {
-    asm volatile("int $0x80");
+    asm volatile("xchgw %bx, %bx");
 
     return 0;
 }

@@ -9,6 +9,8 @@ static void default_handler(u64 id, u64 error_code, proc_t *proc)
     (void)error_code;
     (void)proc;
 
+    asm volatile("xchgw %bx, %bx");
+
     if (id < 30)
     {
         interrupts_disable();

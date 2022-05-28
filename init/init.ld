@@ -1,9 +1,9 @@
 OUTPUT_FORMAT(elf64-x86-64)
-ENTRY(main)
+ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x40000
+    . = 0x40000;
 
     .text : {
         *(.text*)

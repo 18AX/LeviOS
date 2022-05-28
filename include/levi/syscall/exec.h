@@ -1,15 +1,22 @@
 #ifndef EXEC_HEADER
 #define EXEC_HEADER
 
+#include <levi/proc/process.h>
 #include <levi/types.h>
 
 /**
- * @brief create a process from a file descriptor to the file.
+ * @brief exec syscall
  *
- * @param address the address where the memory is mapped
- * @param size size of the
- * @return STATUS
+ * @param proc
+ * @param args0 path to binary
+ * @param args1 process name
+ * @param args2 argv
+ * @param args3 envp
+ * @return u64 return process id
  */
-STATUS exec_from_fd(s32 fd, u32 flags);
+u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3);
+
+u64 kexec(const char *path, const char *proc_name, const char *argv[],
+          const char *envp[]);
 
 #endif

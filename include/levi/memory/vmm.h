@@ -6,6 +6,7 @@
 #define VM_PRESENT 0x1
 #define VM_READ_WRITE 0x2
 #define VM_USER 0x4
+#define VM_EXECUTE_DISABLE (1 << 11)
 
 #define MAP_FAILED 0
 #define MAP_SUCCESS 1

@@ -17,3 +17,22 @@ void syscall64_init()
 {
     register_interrupt_handler(SYSCALL_GATE, syscall_handler);
 }
+
+u64 syscall64_exec(u64 id, u64 args0, u64 args1, u64 args2, u64 args3)
+{
+    register u64 syscall_id asm("rax") = id;
+    register u64 rdi asm("rdi") = args0;
+    register u64 rsi asm("rsi") = args1;
+    register u64 rdx asm("rdx") = args2;
+    register u64 r10 asm("r10") = args3;
+
+    (void)syscall_id;
+    (void)rdi;
+    (void)rsi;
+    (void)rdx;
+    (void)r10;
+
+    asm volatile("int $0x80");
+
+    return syscall_id;
+}

@@ -15,10 +15,18 @@
 #include <levi/proc/scheduler.h>
 #include <levi/stivale2.h>
 #include <levi/types.h>
+#include <levi/utils/kerr.h>
 #include <levi/utils/kprintf.h>
 
 static STATUS early_init(struct stivale2_struct *boot_info)
 {
+    interrupt_init();
+
+    if (arch_init(boot_info) == FAILED)
+    {
+        return FAILED;
+    }
+
     if (kframe_init(boot_info) == FAILED)
     {
         return FAILED;
@@ -33,13 +41,6 @@ static STATUS early_init(struct stivale2_struct *boot_info)
 
     // Map all virtual memory
     memory_init(&kernel_vas);
-
-    interrupt_init();
-
-    if (arch_init(boot_info) == FAILED)
-    {
-        return FAILED;
-    }
 
     proc_t *kernel_proc = proc_kernel("Kernel", &kernel_vas);
 
@@ -124,7 +125,10 @@ void main(struct stivale2_struct *boot_info)
 
     interrupts_enable();
 
-    run_init(boot_info);
+    if (run_init(boot_info) == FAILED)
+    {
+        kerr(KERROR_UNKNOW, "Failed to run init\n");
+    }
 
     asm volatile("xchgw %bx, %bx");
 
