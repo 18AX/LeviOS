@@ -4,6 +4,9 @@
 #include <levi/proc/process.h>
 #include <levi/types.h>
 
+#define USER_STACK_ADDRESS 0x7ff000000000
+#define USER_STACK_PAGE_NB 2048 /** 8388608 bytes **/
+
 /**
  * @brief exec syscall
  *

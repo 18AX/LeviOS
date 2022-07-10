@@ -2,10 +2,11 @@
 #include <levi/arch.h>
 #include <levi/fs/file.h>
 #include <levi/memory/memory.h>
+#include <levi/memory/page_alloc.h>
 #include <levi/proc/scheduler.h>
 #include <levi/syscall/exec.h>
 #include <levi/syscall/syscall.h>
-#include <levi/utils/kprintf.h>
+#include <levi/utils/string.h>
 #include <link.h>
 
 u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
@@ -32,9 +33,6 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
         kclose(fd);
         return SYSCALL_FAILED;
     }
-
-    kprintf("Process allocated\n");
-
     ElfW(Ehdr) header;
 
     kread(fd, &header, sizeof(header));
@@ -45,6 +43,9 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
 
     for (u32 i = 0; i < header.e_phnum; ++i)
     {
+        /** Move the cursor to the next program header **/
+        klseek(fd, header.e_phoff + sizeof(ElfW(Phdr)) * i, FS_SEEK_SET);
+
         ElfW(Phdr) phdr;
 
         kread(fd, &phdr, sizeof(ElfW(Phdr)));
@@ -54,15 +55,21 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
             continue;
         }
 
+        u64 nb_page = (phdr.p_memsz / PAGE_SIZE) + 1;
+
         /** TODO: change with an allocator that keep info on the process **/
-        u64 addr = (u64)kmalloc(phdr.p_memsz);
+        u64 addr = (u64)kframe_alloc(nb_page);
+        memset((void *)addr, 0, phdr.p_memsz);
 
         if (addr == NULL)
         {
+            kclose(fd);
             return SYSCALL_FAILED;
         }
 
-        u32 flags = VM_PRESENT;
+        /** Set flags for the elf segment **/
+
+        u32 flags = VM_PRESENT | VM_USER;
 
         /** segment not executable **/
         if ((phdr.p_flags & PF_X) == 0)
@@ -79,24 +86,29 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
                         phdr.p_memsz, flags)
             == MAP_FAILED)
         {
+            kframe_free((void *)addr, nb_page);
+            kclose(fd);
             return SYSCALL_FAILED;
         }
+
+        /** Copy segment to destination **/
+        klseek(fd, phdr.p_offset, FS_SEEK_SET);
+        kread(fd, (void *)addr, phdr.p_filesz);
     }
 
-    kprintf("Segment mapped");
-
     /** allocate a stack of 8388608 bytes **/
-    if (proc_allocate_stack(n_proc, 0x7ffffffff000, 2048) == FAILED)
+    if (proc_allocate_stack(n_proc, USER_STACK_ADDRESS, USER_STACK_PAGE_NB)
+        == FAILED)
     {
         return SYSCALL_FAILED;
     }
 
-    kprintf("Stack allocated\n");
-
-    arch_init_ctx(&n_proc->ctx, (void *)header.e_entry, (void *)0x7ffffffff000,
+    arch_ctx_init(&n_proc->ctx, (void *)header.e_entry,
+                  (void *)(USER_STACK_ADDRESS + PAGE_SIZE * USER_STACK_PAGE_NB),
                   0);
 
     sched_set(n_proc->id);
+    kclose(fd);
 
     return n_proc->id;
 }
@@ -104,6 +116,25 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
 u64 kexec(const char *path, const char *proc_name, const char *argv[],
           const char *envp[])
 {
-    return ksyscall(SYSCALL_EXEC, (u64)path, (u64)proc_name, (u64)argv,
-                    (u64)envp);
+    proc_t *kernel_proc = proc_get(0);
+
+    u64 id =
+        sys_exec(kernel_proc, (u64)path, (u64)proc_name, (u64)argv, (u64)envp);
+
+    if (id == SYSCALL_FAILED)
+    {
+        return FAILED;
+    }
+
+    proc_t *n_proc = proc_get(id);
+
+    if (n_proc == NULL)
+    {
+        return FAILED;
+    }
+
+    switch_vas(&n_proc->vas);
+    arch_ctx_set(&n_proc->ctx);
+
+    return SUCCESS;
 }

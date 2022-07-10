@@ -2,11 +2,13 @@
 
 #include <levi/arch/x86_64/cpuregs.h>
 #include <levi/arch/x86_64/gdt.h>
+#include <levi/arch/x86_64/tss.h>
 #include <levi/interrupts/interrupts.h>
 #include <levi/memory/vmm.h>
 #include <levi/panic.h>
 #include <levi/proc/process.h>
 #include <levi/proc/scheduler.h>
+#include <levi/syscall/syscall.h>
 #include <levi/utils/kerr.h>
 #include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
@@ -83,11 +85,13 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
 
         if (vma_to_phys(&curr_vas, cr2, &phys_addrr) == MAP_FAILED)
         {
-            kerr(KERROR_VIRTUAL_MEMORY, "Page not present cr2: %lx\n", cr2);
+            kerr(KERROR_VIRTUAL_MEMORY,
+                 "error code %lx Page not present cr2: %lx\n", error_code, cr2);
         }
         else
         {
-            kerr(KERROR_VIRTUAL_MEMORY, "%lx -> %lx\n", cr2, phys_addrr);
+            kerr(KERROR_VIRTUAL_MEMORY, "error code %lx %lx -> %lx\n",
+                 error_code, cr2, phys_addrr);
         }
         break;
     }
@@ -100,10 +104,13 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
     die();
 }
 
-void __isr_c_handler(context_t *ctx)
+void __isr_c_handler(struct isr_context *ctx)
 {
     // Saving the context
+    kprintf("interruption %d %p\n", ctx->index, ctx->rip);
+    asm volatile("xchgw %bx, %bx");
 
+    /** Get the process that was running **/
     proc_t *proc = proc_get(sched_get());
 
     if (proc == NULL)
@@ -111,17 +118,21 @@ void __isr_c_handler(context_t *ctx)
         die();
     }
 
-    memcpy(&proc->ctx, ctx, sizeof(context_t));
+    /** Save the process context registers + tss **/
+    memcpy(&proc->ctx.isr_ctx, ctx, sizeof(struct isr_context));
 
+    /** throw the interrupts **/
     throw_interrupts(ctx->index, ctx->error_code, proc);
 
+    /** Get the new process to run **/
     proc = proc_get(sched_get());
 
     kprintf("%d\n", sched_get());
 
-    // Restore process context
-    memcpy(ctx, &proc->ctx, sizeof(context_t));
+    /** restore the process vas **/
     switch_vas(&proc->vas);
+
+    memcpy(ctx, &proc->ctx.isr_ctx, sizeof(struct isr_context));
 }
 
 extern void isr_0(void);

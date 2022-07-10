@@ -1,12 +1,31 @@
 #ifndef ARCH_HEADER
 #define ARCH_HEADER
 
-#include "levi/stivale2.h"
-#include "levi/types.h"
+#include <levi/arch/x86_64/tss.h>
+#include <levi/stivale2.h>
+#include <levi/types.h>
 
 // Struct registers to be define by the arch
 
 #if 1
+#    define RFLAGS_CF (1)
+#    define RFLAGS_RESERVED1 (1 << 1)
+#    define RFLAGS_PF (1 << 2)
+#    define RFLAGS_AF (1 << 4)
+#    define RFLAGS_ZF (1 << 6)
+#    define RFLAGS_SF (1 << 7)
+#    define RFLAGS_OF (1 << 11)
+#    define RFLAGS_DF (1 << 10)
+
+#    define RFLAGS_IF (1 << 9)
+#    define RFLAGS_IOPL (x)((x & 0x3) << 12)
+#    define RFLAGS_NT (1 << 14)
+#    define RFLAGS_RF (1 << 16)
+#    define RFLAGS_VM (1 << 17)
+#    define RFLAGS_AC (1 << 18)
+#    define RFLAGS_VIF (1 << 19)
+#    define RFLAGS_VIP (1 << 20)
+#    define RFLAGS_ID (1 << 21)
 
 typedef struct registers
 {
@@ -27,23 +46,30 @@ typedef struct registers
     u64 rbp;
 } __attribute__((packed)) regs_t;
 
-typedef struct context
+struct isr_context
 {
     regs_t regs;
     u64 index;
     u64 error_code;
     u64 rip;
     u64 cs;
-    u64 eflags;
+    u64 rflags;
     u64 rsp;
     u64 ss;
-} __attribute__((packed)) context_t;
+} __attribute__((packed));
+
+typedef struct context
+{
+    struct isr_context isr_ctx;
+} context_t;
 
 #endif
 
 STATUS
 arch_init(struct stivale2_struct *boot_info);
 
-void arch_init_ctx(context_t *ctx, void *entry, void *stack, u8 is_kernel);
+void arch_ctx_init(context_t *ctx, void *entry, void *stack, u8 is_kernel);
+
+void arch_ctx_set(context_t *ctx);
 
 #endif

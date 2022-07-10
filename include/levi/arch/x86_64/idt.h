@@ -27,6 +27,6 @@ struct idt_64_ptr
 
 void idt_init(void);
 
-void __isr_c_handler(context_t *ctx);
+void __isr_c_handler(struct isr_context *ctx);
 
 #endif

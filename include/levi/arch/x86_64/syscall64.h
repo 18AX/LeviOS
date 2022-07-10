@@ -19,6 +19,4 @@
  */
 void syscall64_init(void);
 
-u64 syscall64_exec(u64 id, u64 args0, u64 args1, u64 args2, u64 args3);
-
 #endif

@@ -4,6 +4,8 @@
 #include <levi/syscall/syscall.h>
 #include <levi/utils/string.h>
 
+static u8 syscall_stack[SYSCALL_STACK_SIZE];
+
 static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
     [SYSCALL_EXEC] = sys_exec,
 };
@@ -51,7 +53,7 @@ STATUS cpy_to_proc(proc_t *proc, void *dest, void *src, u64 size)
     return SUCCESS;
 }
 
-u64 ksyscall(u64 syscall_id, u64 args0, u64 args1, u64 args2, u64 args3)
+void *syscall_stack_addr(void)
 {
-    return syscall64_exec(syscall_id, args0, args1, args2, args3);
+    return (void *)(syscall_stack + SYSCALL_STACK_SIZE);
 }

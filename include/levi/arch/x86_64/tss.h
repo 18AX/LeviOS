@@ -17,4 +17,6 @@ struct task_state_segment
 
 struct gdt_tss_entry tss_create_entry(void);
 
+void tss_ltr();
+
 #endif

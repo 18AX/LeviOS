@@ -39,7 +39,6 @@ int liballoc_unlock()
 void *liballoc_alloc(u64 pages)
 {
     return kframe_alloc(pages);
-    ;
 }
 
 int liballoc_free(void *ptr, u64 pages)

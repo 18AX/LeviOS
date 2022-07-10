@@ -1,5 +1,6 @@
 .PHONY: all clean iso kernel test
 
+
 all: iso
 
 iso: x86_64
@@ -8,6 +9,9 @@ iso: x86_64
 x86_64:
 	$(MAKE) -C kernel x86_64
 	$(MAKE) -C init
+
+test: iso
+	bochs
 
 clean:
 	$(MAKE) -C kernel clean

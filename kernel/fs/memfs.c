@@ -8,6 +8,7 @@ static file_t *__open(const char *name, u32 flags);
 static void __destroy_file(file_t *file);
 static s32 __write(file_t *file, u8 *buffer, u32 size);
 static s32 __read(file_t *file, u8 *buffer, u32 size);
+static s32 __lseek(file_t *file, u64 offset, u32 whence);
 
 static struct vfs_operation memfs_operation = { .mkdir = NULL,
                                                 .rmdir = NULL,
@@ -17,7 +18,7 @@ static struct vfs_operation memfs_operation = { .mkdir = NULL,
                                                 .destroy_file = __destroy_file,
                                                 .flush = NULL,
                                                 .read = __read,
-                                                .lseek = NULL };
+                                                .lseek = __lseek };
 
 static struct vfs memfs = { .name = "memfs",
                             .flags = 0x0,
@@ -112,6 +113,43 @@ static file_t *__open(const char *name, u32 flags)
     memfile->open_count += 1;
 
     return file;
+}
+
+static s32 __lseek(file_t *file, u64 offset, u32 whence)
+{
+    memfile_t *memfile = file->data;
+
+    switch (whence)
+    {
+    case FS_SEEK_SET:
+        if (offset > memfile->size)
+        {
+            return -1;
+        }
+
+        file->cursor_position = offset;
+        break;
+    case FS_SEEK_CUR:
+        if (file->cursor_position + offset > memfile->size)
+        {
+            return -1;
+        }
+
+        file->cursor_position += offset;
+        break;
+    case FS_SEEK_END:
+        if (memfile->size + offset > memfile->size)
+        {
+            return -1;
+        }
+
+        file->cursor_position = memfile->size + offset;
+        break;
+    default:
+        return -1;
+    }
+
+    return file->cursor_position;
 }
 
 static void __destroy_file(file_t *file)

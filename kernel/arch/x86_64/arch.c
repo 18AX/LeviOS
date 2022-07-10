@@ -5,6 +5,8 @@
 #include <levi/arch/x86_64/pci.h>
 #include <levi/arch/x86_64/pic.h>
 #include <levi/arch/x86_64/syscall64.h>
+#include <levi/arch/x86_64/tss.h>
+#include <levi/syscall/syscall.h>
 #include <levi/utils/string.h>
 
 STATUS arch_init(struct stivale2_struct *boot_info)
@@ -31,14 +33,30 @@ STATUS arch_init(struct stivale2_struct *boot_info)
     return SUCCESS;
 }
 
-void arch_init_ctx(context_t *ctx, void *entry, void *stack, u8 is_kernel)
+void arch_ctx_init(context_t *ctx, void *entry, void *stack, u8 is_kernel)
 {
     memset(ctx, 0x0, sizeof(context_t));
 
-    ctx->cs = is_kernel ? SEGMENT_SELECTOR(1, 0, 0) : SEGMENT_SELECTOR(3, 0, 3);
-    ctx->ss = is_kernel ? SEGMENT_SELECTOR(2, 0, 0) : SEGMENT_SELECTOR(4, 0, 3);
-    ctx->rip = (u64)entry;
-    ctx->rsp = (u64)stack;
-    ctx->regs.rbp = (u64)stack;
-    ;
+    ctx->isr_ctx.rip = (u64)entry;
+    ctx->isr_ctx.rsp = (u64)stack;
+    ctx->isr_ctx.regs.rbp = (u64)stack;
+
+    if (is_kernel)
+    {
+        ctx->isr_ctx.cs = SEGMENT_SELECTOR(1, 0, 0);
+        ctx->isr_ctx.ss = SEGMENT_SELECTOR(2, 0, 0);
+    }
+    else
+    {
+        ctx->isr_ctx.rflags = RFLAGS_IF | RFLAGS_RESERVED1;
+        ctx->isr_ctx.cs = SEGMENT_SELECTOR(3, 0, 3);
+        ctx->isr_ctx.ss = SEGMENT_SELECTOR(4, 0, 3);
+    }
+}
+
+extern void __ctx_set(struct isr_context *isr_ctx);
+
+void arch_ctx_set(context_t *ctx)
+{
+    __ctx_set(&ctx->isr_ctx);
 }

@@ -37,15 +37,17 @@ void gdt_init()
     gdt.segments[3] = gdt_entry_create(GDT_ACCESS_PRESENT | GDT_ACCESS_DPL(3)
                                            | GDT_ACCESS_TYPE_CODE_DATA
                                            | GDT_ACCESS_EXECUTABLE,
-                                       GDT_FLAG_4KIB | GDT_FLAG_4KIB);
+                                       GDT_FLAG_4KIB | GDT_FLAG_LONG);
 
     /** User data **/
     gdt.segments[4] =
         gdt_entry_create(GDT_ACCESS_PRESENT | GDT_ACCESS_DPL(3)
                              | GDT_ACCESS_TYPE_CODE_DATA | GDT_ACCESS_RW,
-                         GDT_FLAG_4KIB | GDT_FLAG_4KIB);
+                         GDT_FLAG_4KIB | GDT_FLAG_LONG);
 
     gdt.tss = tss_create_entry();
 
     __gdt_update_segments(&gdt_ptr);
+
+    tss_ltr();
 }

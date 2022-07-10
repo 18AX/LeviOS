@@ -43,6 +43,7 @@ x86_64_OBJ= $(KERNEL_OBJ) \
 	arch/x86_64/gdt.c.o \
 	arch/x86_64/tss.c.o \
 	arch/x86_64/gdt.S.o \
+	arch/x86_64/arch.S.o \
 	arch/x86_64/vmm.c.o \
 	arch/x86_64/arch.c.o \
 	arch/x86_64/idt.c.o \

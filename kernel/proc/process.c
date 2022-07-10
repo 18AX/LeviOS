@@ -97,6 +97,30 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     return proc;
 }
 
+MAP_STATUS my_vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size,
+                          u64 flags)
+{
+    u64 i;
+    for (i = 0; i < size; i += PAGE_SIZE)
+    {
+        if (vmmap(vas, physical + i, virt + i, flags) == MAP_FAILED)
+        {
+            kprintf("i=%ld size=%ld physical %lx virt %lx\n", i, size,
+                    physical + i, virt + i);
+            kprintf("Segment mapped");
+            switch_vas(vas);
+
+            for (;;)
+                ;
+            return MAP_FAILED;
+        }
+    }
+
+    kprintf("i=%ld\n", i);
+
+    return MAP_SUCCESS;
+}
+
 STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
 {
     if (proc == NULL)
@@ -120,11 +144,16 @@ STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
         vmmap_flags |= VM_USER;
     }
 
-    if (vmmap_range(&proc->vas, phys_addr, virt_address, PAGE_SIZE * nb_page,
-                    vmmap_flags)
+    u64 nb_bytes = PAGE_SIZE * nb_page;
+
+    kprintf("%ld bytes %lx\n", nb_bytes, nb_bytes);
+
+    if (my_vmmap_range(&proc->vas, phys_addr, virt_address, nb_bytes,
+                       vmmap_flags)
         == MAP_FAILED)
     {
         kframe_free((void *)addr, nb_page);
+        return FAILED;
     }
 
     return SUCCESS;
