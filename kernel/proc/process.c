@@ -1,7 +1,6 @@
 #include <levi/memory/memory.h>
 #include <levi/memory/page_alloc.h>
 #include <levi/proc/process.h>
-#include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
 
 static proc_t *proc_list[MAX_PROCESS] = { NULL };
@@ -59,7 +58,6 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     if (found == FAILED)
     {
         kfree(proc);
-        kprintf("NOT FOUND\n");
         return NULL;
     }
 
@@ -69,7 +67,6 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     /** Initialize process virtual address space **/
     if (fill_empty_vas(&proc->vas) == FAILED)
     {
-        kprintf("FAILED to empty vas\n");
         kfree(proc);
         return NULL;
     }
@@ -80,7 +77,6 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
 
     if (kernel_proc == NULL)
     {
-        kprintf("KERNEL PROC NOT FOUND\n");
         kfree(proc);
         return NULL;
     }
@@ -95,30 +91,6 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
     }
 
     return proc;
-}
-
-MAP_STATUS my_vmmap_range(vas_t *vas, u64 physical, u64 virt, u64 size,
-                          u64 flags)
-{
-    u64 i;
-    for (i = 0; i < size; i += PAGE_SIZE)
-    {
-        if (vmmap(vas, physical + i, virt + i, flags) == MAP_FAILED)
-        {
-            kprintf("i=%ld size=%ld physical %lx virt %lx\n", i, size,
-                    physical + i, virt + i);
-            kprintf("Segment mapped");
-            switch_vas(vas);
-
-            for (;;)
-                ;
-            return MAP_FAILED;
-        }
-    }
-
-    kprintf("i=%ld\n", i);
-
-    return MAP_SUCCESS;
 }
 
 STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
@@ -146,10 +118,7 @@ STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
 
     u64 nb_bytes = PAGE_SIZE * nb_page;
 
-    kprintf("%ld bytes %lx\n", nb_bytes, nb_bytes);
-
-    if (my_vmmap_range(&proc->vas, phys_addr, virt_address, nb_bytes,
-                       vmmap_flags)
+    if (vmmap_range(&proc->vas, phys_addr, virt_address, nb_bytes, vmmap_flags)
         == MAP_FAILED)
     {
         kframe_free((void *)addr, nb_page);

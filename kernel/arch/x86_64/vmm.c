@@ -110,8 +110,6 @@ static struct pml_entry *find_page(vas_t *vm, u64 virt)
     return &pt[pml0_idx];
 }
 
-#include <levi/utils/kprintf.h>
-
 MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 {
     if (vas == NULL)
@@ -134,7 +132,6 @@ MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pdpt == NULL)
     {
-        kprintf("AAAAAAA1\n");
         return MAP_FAILED;
     }
 
@@ -143,7 +140,6 @@ MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pd == NULL)
     {
-        kprintf("AAAAAAA2\n");
         return MAP_FAILED;
     }
 
@@ -152,13 +148,11 @@ MAP_STATUS vmmap(vas_t *vas, u64 physical, u64 virt, u64 flags)
 
     if (pt == NULL)
     {
-        kprintf("AAAAAAA3\n");
         return MAP_FAILED;
     }
 
     if (pt[pml0_idx].present == 1)
     {
-        kprintf("AAAAAAA4\n");
         if (((u64)pt[pml0_idx].page_table_addr) == physical)
         {
             return MAP_PRESENT;

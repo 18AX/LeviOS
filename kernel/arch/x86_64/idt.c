@@ -107,8 +107,6 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
 void __isr_c_handler(struct isr_context *ctx)
 {
     // Saving the context
-    kprintf("interruption %d %p\n", ctx->index, ctx->rip);
-    asm volatile("xchgw %bx, %bx");
 
     /** Get the process that was running **/
     proc_t *proc = proc_get(sched_get());
@@ -126,8 +124,6 @@ void __isr_c_handler(struct isr_context *ctx)
 
     /** Get the new process to run **/
     proc = proc_get(sched_get());
-
-    kprintf("%d\n", sched_get());
 
     /** restore the process vas **/
     switch_vas(&proc->vas);

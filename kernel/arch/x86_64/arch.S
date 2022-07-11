@@ -29,6 +29,4 @@ __ctx_set:
 
     movq 40(%rdi),%rdi
 
-    xchgw %bx, %bx
-
     iretq
