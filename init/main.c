@@ -1,4 +1,4 @@
-__attribute__((naked)) int main(void)
+int main(void)
 {
     asm volatile("xchgw %bx, %bx");
 

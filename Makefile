@@ -8,6 +8,7 @@ iso: x86_64
 
 x86_64:
 	$(MAKE) -C kernel x86_64
+	$(MAKE) -C liblevi
 	$(MAKE) -C init
 
 test: iso
@@ -15,5 +16,6 @@ test: iso
 
 clean:
 	$(MAKE) -C kernel clean
+	$(MAKE) -C liblevi clean
 	$(MAKE) -C init clean
 	$(RM) levi.iso

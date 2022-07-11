@@ -138,3 +138,8 @@ u64 kexec(const char *path, const char *proc_name, const char *argv[],
 
     return SUCCESS;
 }
+
+s64 exec(const char *path, const char *name, const char *argv[],
+         const char *envp[]);
+
+s64 exit(s64 exit_status);
