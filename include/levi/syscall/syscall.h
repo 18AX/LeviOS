@@ -6,18 +6,19 @@
 
 #define SYSCALL_STACK_SIZE 1048576
 
-#define SYSCALL_NBR 10
+#define SYSCALL_NBR 11
 
 #define SYSCALL_OPEN 0
 #define SYSCALL_READ 1
 #define SYSCALL_WRITE 2
 #define SYSCALL_CLOSE 3
 #define SYSCALL_LSEEK 4
-#define SYSCALL_DUP2 5
-#define SYSCALL_EXEC 5
-#define SYSCALL_EXIT 7
-#define SYSCALL_HEAP_ALLOC 8
-#define SYSCALL_HEAP_FREE 9
+#define SYSCALL_FLUSH 5
+#define SYSCALL_DUP2 6
+#define SYSCALL_EXEC 7
+#define SYSCALL_EXIT 8
+#define SYSCALL_HEAP_ALLOC 9
+#define SYSCALL_HEAP_FREE 10
 
 #define SYSCALL_FAILED 0xFFFFFFFFFFFFFFFF
 
@@ -32,6 +33,8 @@ STATUS syscall_init(void);
 STATUS cpy_from_proc(proc_t *proc, void *dest, void *src, u64 size);
 
 STATUS cpy_to_proc(proc_t *proc, void *dest, void *src, u64 size);
+
+void *ptr_from_proc(proc_t *proc, void *ptr);
 
 void *syscall_stack_addr(void);
 

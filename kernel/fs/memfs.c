@@ -6,9 +6,9 @@
 
 static file_t *__open(const char *name, u32 flags);
 static void __destroy_file(file_t *file);
-static s32 __write(file_t *file, u8 *buffer, u32 size);
-static s32 __read(file_t *file, u8 *buffer, u32 size);
-static s32 __lseek(file_t *file, u64 offset, u32 whence);
+static s64 __write(file_t *file, u8 *buffer, u64 size);
+static s64 __read(file_t *file, u8 *buffer, u64 size);
+static s64 __lseek(file_t *file, u64 offset, u32 whence);
 
 static struct vfs_operation memfs_operation = { .mkdir = NULL,
                                                 .rmdir = NULL,
@@ -115,7 +115,7 @@ static file_t *__open(const char *name, u32 flags)
     return file;
 }
 
-static s32 __lseek(file_t *file, u64 offset, u32 whence)
+static s64 __lseek(file_t *file, u64 offset, u32 whence)
 {
     memfile_t *memfile = file->data;
 
@@ -164,7 +164,7 @@ static void __destroy_file(file_t *file)
     kfree(file);
 }
 
-static s32 __write(file_t *file, u8 *buffer, u32 size)
+static s64 __write(file_t *file, u8 *buffer, u64 size)
 {
     memfile_t *data = file->data;
 
@@ -187,7 +187,7 @@ static s32 __write(file_t *file, u8 *buffer, u32 size)
     return size;
 }
 
-static s32 __read(file_t *file, u8 *buffer, u32 size)
+static s64 __read(file_t *file, u8 *buffer, u64 size)
 {
     memfile_t *data = file->data;
 

@@ -1,3 +1,4 @@
+#include <string.h>
 #include <syscall.h>
 
 #define SYSCALL_FAILED 0xFFFFFFFFFFFFFFFF
@@ -23,7 +24,8 @@ static u64 sys_exec(u64 sys_id, u64 arg0, u64 arg1, u64 arg2, u64 arg3)
 
 s32 open(const char *pathname, u32 flags)
 {
-    u64 ret = sys_exec(SYSCALL_OPEN, (u64)pathname, (u64)flags, 0, 0);
+    u64 len = strlen(pathname);
+    u64 ret = sys_exec(SYSCALL_OPEN, (u64)pathname, len, (u64)flags, 0);
 
     if (ret == SYSCALL_FAILED)
     {
@@ -71,7 +73,7 @@ s64 read(s32 fd, void *buffer, u64 size)
 
 s32 flush(s32 fd)
 {
-    u64 ret = sys_exec(SYSCALL_WRITE, (u64)fd, 0, 0, 0);
+    u64 ret = sys_exec(SYSCALL_FLUSH, (u64)fd, 0, 0, 0);
 
     if (ret == SYSCALL_FAILED)
     {

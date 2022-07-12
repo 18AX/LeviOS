@@ -6,7 +6,7 @@
 #include "levi/utils/string.h"
 
 static file_t *__open(const char *name, u32 flags);
-static s32 __write(file_t *file, u8 *buffer, u32 size);
+static s64 __write(file_t *file, u8 *buffer, u64 size);
 static void __destroy_file(file_t *file);
 
 static struct vfs_operation serial_operation = { .mkdir = NULL,
@@ -64,7 +64,7 @@ static file_t *__open(const char *name, u32 flags)
     return NULL;
 }
 
-static s32 __write(file_t *file, u8 *buffer, u32 size)
+static s64 __write(file_t *file, u8 *buffer, u64 size)
 {
     u64 w = 0;
 

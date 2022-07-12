@@ -54,7 +54,7 @@ STATUS close(s32 fd, proc_t *process)
     return SUCCESS;
 }
 
-s32 write(s32 fd, void *buffer, u32 size, proc_t *process)
+s64 write(s32 fd, void *buffer, u64 size, proc_t *process)
 {
     if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
@@ -77,7 +77,7 @@ s32 write(s32 fd, void *buffer, u32 size, proc_t *process)
     return f->vfs->operation->write(f, (u8 *)buffer, size);
 }
 
-s32 read(s32 fd, void *buffer, u32 size, proc_t *process)
+s64 read(s32 fd, void *buffer, u64 size, proc_t *process)
 {
     if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
@@ -113,7 +113,7 @@ s32 flush(s32 fd, proc_t *process)
     return f->vfs->operation->flush(f);
 }
 
-s32 lseek(s32 fd, u64 offset, u32 whence, proc_t *process)
+s64 lseek(s32 fd, u64 offset, u32 whence, proc_t *process)
 {
     if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
     {
@@ -167,14 +167,14 @@ STATUS kclose(s32 fd)
     return close(fd, kern_proc);
 }
 
-s32 kwrite(u32 fd, void *buffer, u32 size)
+s64 kwrite(u32 fd, void *buffer, u64 size)
 {
     proc_t *kern_proc = proc_get(0);
 
     return write(fd, buffer, size, kern_proc);
 }
 
-s32 kread(u32 fd, void *buffer, u32 size)
+s64 kread(u32 fd, void *buffer, u64 size)
 {
     proc_t *kern_proc = proc_get(0);
 
@@ -188,7 +188,7 @@ s32 kflush(u32 fd)
     return flush(fd, kern_proc);
 }
 
-s32 klseek(s32 fd, u64 offset, u32 whence)
+s64 klseek(s32 fd, u64 offset, u32 whence)
 {
     proc_t *kern_proc = proc_get(0);
 

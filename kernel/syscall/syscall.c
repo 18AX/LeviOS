@@ -1,12 +1,18 @@
 #include <levi/arch/x86_64/syscall64.h>
 #include <levi/memory/memory.h>
 #include <levi/syscall/exec.h>
+#include <levi/syscall/flush.h>
+#include <levi/syscall/open.h>
 #include <levi/syscall/syscall.h>
+#include <levi/syscall/write.h>
 #include <levi/utils/string.h>
 
 static u8 syscall_stack[SYSCALL_STACK_SIZE];
 
 static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
+    [SYSCALL_OPEN] = sys_open,
+    [SYSCALL_WRITE] = sys_write,
+    [SYSCALL_FLUSH] = sys_flush,
     [SYSCALL_EXEC] = sys_exec,
 };
 
@@ -51,6 +57,18 @@ STATUS cpy_to_proc(proc_t *proc, void *dest, void *src, u64 size)
     memcpy((void *)kern_addr, src, size);
 
     return SUCCESS;
+}
+
+void *ptr_from_proc(proc_t *proc, void *ptr)
+{
+    u64 phys_address = 0x0;
+
+    if (vma_to_phys(&proc->vas, (u64)ptr, &phys_address) == MAP_FAILED)
+    {
+        return NULL;
+    }
+
+    return (void *)phys_to_hhdm(phys_address);
 }
 
 void *syscall_stack_addr(void)

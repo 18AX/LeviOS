@@ -16,7 +16,7 @@ struct console_data
 
 static file_t *__open(const char *name, u32 flags);
 static void __destroy_file(file_t *file);
-static s32 __write(file_t *file, u8 *buffer, u32 size);
+static s64 __write(file_t *file, u8 *buffer, u64 size);
 static s32 __flush(file_t *file);
 
 /**
@@ -100,7 +100,7 @@ static void __destroy_file(file_t *file)
     kfree(file);
 }
 
-static s32 __write(file_t *file, u8 *buffer, u32 size)
+static s64 __write(file_t *file, u8 *buffer, u64 size)
 {
     struct console_data *data = file->data;
 

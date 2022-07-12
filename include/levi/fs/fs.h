@@ -10,6 +10,8 @@
 #define FS_SEEK_CUR 1
 #define FS_SEEK_END 2
 
+#define PATH_MAX_LEN 128
+
 typedef struct file
 {
     u32 flags;
@@ -25,11 +27,11 @@ struct vfs_operation
     s32 (*rmdir)(const char *path);
     s32 (*rename)(const char *path, const char *name);
 
-    s32 (*read)(file_t *file, u8 *buffer, u32 size);
-    s32 (*write)(file_t *file, u8 *buffer, u32 size);
+    s64 (*read)(file_t *file, u8 *buffer, u64 size);
+    s64 (*write)(file_t *file, u8 *buffer, u64 size);
     file_t *(*open)(const char *name, u32 flags);
     s32 (*flush)(file_t *file);
-    s32 (*lseek)(file_t *file, u64 offset, u32 whence);
+    s64 (*lseek)(file_t *file, u64 offset, u32 whence);
 
     void (*destroy_file)(file_t *file);
 };
