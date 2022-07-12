@@ -56,7 +56,7 @@ static STATUS early_init(struct stivale2_struct *boot_info)
 
 static STATUS init_kernel_io()
 {
-    int fd = kopen("serial:COM1", FS_READ | FS_WRITE);
+    int fd = kopen("console:", FS_READ | FS_WRITE);
 
     if (fd < 0)
     {

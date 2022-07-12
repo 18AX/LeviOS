@@ -3,6 +3,7 @@
 #include <levi/syscall/exec.h>
 #include <levi/syscall/flush.h>
 #include <levi/syscall/open.h>
+#include <levi/syscall/read.h>
 #include <levi/syscall/syscall.h>
 #include <levi/syscall/write.h>
 #include <levi/utils/string.h>
@@ -10,9 +11,8 @@
 static u8 syscall_stack[SYSCALL_STACK_SIZE];
 
 static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
-    [SYSCALL_OPEN] = sys_open,
-    [SYSCALL_WRITE] = sys_write,
-    [SYSCALL_FLUSH] = sys_flush,
+    [SYSCALL_OPEN] = sys_open,   [SYSCALL_READ] = sys_read,
+    [SYSCALL_WRITE] = sys_write, [SYSCALL_FLUSH] = sys_flush,
     [SYSCALL_EXEC] = sys_exec,
 };
 
