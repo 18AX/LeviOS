@@ -30,7 +30,7 @@ s32 open(const char *pathname, u32 flags);
 
 s64 close(s32 fd);
 
-s64 write(s32 fd, void *buffer, u64 size);
+s64 write(s32 fd, const void *buffer, u64 size);
 
 s64 read(s32 fd, void *buffer, u64 size);
 

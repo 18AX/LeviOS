@@ -38,6 +38,7 @@ KERNEL_OBJ= kmain.c.o \
 	syscall/write.c.o \
 	syscall/flush.c.o \
 	syscall/exit.c.o \
+	syscall/dup2.c.o \
 	syscall/mmap.c.o \
 	modules/module.c.o \
 	init.c.o \

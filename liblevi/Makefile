@@ -7,6 +7,7 @@ OBJECTS=crt0.o \
 		start.o \
 		syscall.o \
 		string.o \
+		stdio.o \
 
 .PHONY: all clean
 

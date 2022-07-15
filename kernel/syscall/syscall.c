@@ -1,5 +1,6 @@
 #include <levi/arch/x86_64/syscall64.h>
 #include <levi/memory/memory.h>
+#include <levi/syscall/dup2.h>
 #include <levi/syscall/exec.h>
 #include <levi/syscall/exit.h>
 #include <levi/syscall/flush.h>
@@ -15,8 +16,8 @@ static u8 syscall_stack[SYSCALL_STACK_SIZE];
 static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
     [SYSCALL_OPEN] = sys_open,   [SYSCALL_READ] = sys_read,
     [SYSCALL_WRITE] = sys_write, [SYSCALL_FLUSH] = sys_flush,
-    [SYSCALL_EXEC] = sys_exec,   [SYSCALL_EXIT] = sys_exit,
-    [SYSCALL_MMAP] = sys_mmap
+    [SYSCALL_DUP2] = sys_dup2,   [SYSCALL_EXEC] = sys_exec,
+    [SYSCALL_EXIT] = sys_exit,   [SYSCALL_MMAP] = sys_mmap
 };
 
 u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,

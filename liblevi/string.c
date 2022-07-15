@@ -19,6 +19,39 @@ void *memset(void *dest, int val, u64 len)
     return dest;
 }
 
+void *memmove(void *dest, const void *src, u64 n)
+{
+    u8 *from = (u8 *)src;
+    u8 *to = (u8 *)dest;
+
+    if (from == to || n == 0)
+        return dest;
+    if (to > from && to - from < (s32)n)
+    {
+        /* to overlaps with from */
+        /*  <from......>         */
+        /*         <to........>  */
+        /* copy in reverse, to avoid overwriting from */
+        s32 i;
+        for (i = n - 1; i >= 0; i--)
+            to[i] = from[i];
+        return dest;
+    }
+    if (from > to && from - to < (s32)n)
+    {
+        /* to overlaps with from */
+        /*        <from......>   */
+        /*  <to........>         */
+        /* copy forwards, to avoid overwriting from */
+        u64 i;
+        for (i = 0; i < n; i++)
+            to[i] = from[i];
+        return dest;
+    }
+    memcpy(dest, src, n);
+    return dest;
+}
+
 u64 strlen(const char *str)
 {
     u64 len = 0;

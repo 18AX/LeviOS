@@ -47,7 +47,7 @@ s64 close(s32 fd)
     return ret;
 }
 
-s64 write(s32 fd, void *buffer, u64 size)
+s64 write(s32 fd, const void *buffer, u64 size)
 {
     u64 ret = sys_exec(SYSCALL_WRITE, (u64)fd, (u64)buffer, size, 0);
 
