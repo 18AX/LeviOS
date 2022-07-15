@@ -128,7 +128,7 @@ STATUS proc_allocate_stack(proc_t *proc, u64 virt_address, u64 nb_page)
     return SUCCESS;
 }
 
-void process_delete(proc_t *proc)
+void proc_destroy(proc_t *proc)
 {
     if (proc == NULL || proc->id >= MAX_PROCESS)
     {
