@@ -19,6 +19,7 @@ typedef struct process
     vas_t vas;
     file_t *fds[FD_TABLE_LEN];
     u32 flags;
+    u64 end_code;
     context_t ctx;
 } proc_t;
 

@@ -132,3 +132,15 @@ s64 exit(s64 exit_status)
 
     return ret;
 }
+
+void *mmap(void *address, u64 nb_page, u64 flags)
+{
+    u64 ret = sys_exec(SYSCALL_MMAP, (u64)address, nb_page, flags, 0);
+
+    if (ret == SYSCALL_FAILED)
+    {
+        return NULL;
+    }
+
+    return (void *)ret;
+}

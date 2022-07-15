@@ -41,6 +41,8 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
 
     klseek(fd, header.e_phoff, FS_SEEK_SET);
 
+    u64 max_addr = 0x0;
+
     for (u32 i = 0; i < header.e_phnum; ++i)
     {
         /** Move the cursor to the next program header **/
@@ -94,7 +96,14 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
         /** Copy segment to destination **/
         klseek(fd, phdr.p_offset, FS_SEEK_SET);
         kread(fd, (void *)addr, phdr.p_filesz);
+
+        if ((phdr.p_vaddr + phdr.p_memsz) > max_addr)
+        {
+            max_addr = phdr.p_vaddr + phdr.p_memsz;
+        }
     }
+
+    n_proc->end_code = max_addr;
 
     /** allocate a stack of 8388608 bytes **/
     if (proc_allocate_stack(n_proc, USER_STACK_ADDRESS, USER_STACK_PAGE_NB)
