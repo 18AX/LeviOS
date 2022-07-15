@@ -41,6 +41,12 @@ MAP_STATUS vma_to_phys(vas_t *vas, u64 virt, u64 *phys);
 
 MAP_STATUS vascpy(vas_t *dst, vas_t *src);
 
+/**
+ * @brief Free a virtual address space. The page contained in the last layer of
+ * the pml are freed too.
+ *
+ * @param vas
+ */
 void destroy_vas(vas_t *vas);
 
 #endif

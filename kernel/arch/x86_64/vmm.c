@@ -246,7 +246,19 @@ void destroy_vas(vas_t *vas)
 {
     struct pml_entry *pml = vas->data;
 
-    destroy_vas_rec(pml);
+    for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
+    {
+        /** We skip kernel memory mapping **/
+        if (i == 0x1FF)
+        {
+            continue;
+        }
+
+        destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
+            (u64)LSHIFT(pml[i].page_table_addr, 12))));
+    }
+
+    kframe_free(pml, 1);
 
     kfree(vas);
 }
