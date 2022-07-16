@@ -9,11 +9,6 @@
 #define LINE_HEIGH 15
 #define CHAR_WIDTH 10
 
-struct console_data
-{
-    list_t *lines;
-};
-
 static file_t *__open(const char *name, u32 flags);
 static void __destroy_file(file_t *file);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
@@ -44,6 +39,8 @@ static vfs console_vfs = { .name = "console",
 static struct framebuffer_info framebuffer_info = { 0 };
 static u32 max_lines = 0;
 static s32 framebuffer_fd = -1;
+static u32 x = 0;
+static u32 y = 0;
 
 STATUS console_init(void)
 {
@@ -76,109 +73,85 @@ static file_t *__open(const char *name, u32 flags)
         return NULL;
     }
 
-    struct console_data *data = kmalloc(sizeof(struct console_data));
-
-    if (data == NULL)
-    {
-        kfree(f);
-        return NULL;
-    }
-
-    f->data = data;
-    data->lines = list_create();
+    f->data = NULL;
 
     return f;
 }
 
+static void increment_x(void)
+{
+    if (x + CHAR_WIDTH >= framebuffer_info.width)
+    {
+        x = 0;
+        y += LINE_HEIGH;
+    }
+    else
+    {
+        x += CHAR_WIDTH;
+    }
+}
+
+static void increment_y(void)
+{
+    y += LINE_HEIGH;
+}
+
 static void __destroy_file(file_t *file)
 {
-    struct console_data *data = file->data;
-
-    list_destroy(data->lines, kfree);
-
-    kfree(file->data);
     kfree(file);
+}
+
+static u32 handle_char(char c, u32 color)
+{
+    switch (c)
+    {
+    case '\n':
+        increment_y();
+        x = 0;
+        return 0;
+        break;
+    case '\t':
+        increment_x();
+        increment_x();
+        increment_x();
+        increment_x();
+        return 4;
+    default:
+        write_char(x, y, color, c);
+        increment_x();
+        return 1;
+    }
 }
 
 static s64 __write(file_t *file, u8 *buffer, u64 size)
 {
-    struct console_data *data = file->data;
-
-    char *char_buffer = (char *)buffer;
-    s32 index = -1;
-
-    s32 written = 0;
-
-    while ((index = charindex(char_buffer, '\n')) != -1 && (u32)written < size)
-    {
-        u32 n = index;
-
-        if (written + n > size)
-        {
-            n = size - written;
-        }
-
-        char *line = strndup(char_buffer, n);
-
-        if (line == NULL)
-        {
-            break;
-        }
-
-        written += n;
-
-        list_add(data->lines, line);
-
-        char_buffer += n + 1;
-    }
-
-    if (char_buffer[0] != '\0' && (u32)written < size)
-    {
-        u32 to_write = size - written;
-
-        char *line = strndup(char_buffer, to_write);
-
-        if (line != NULL)
-        {
-            written += strlen(line);
-            list_add(data->lines, line);
-        }
-    }
-
-    return written;
-}
-
-static u32 console_write_line(u32 index, void *line)
-{
-    if (index >= max_lines)
-    {
-        return 0;
-    }
+    (void)file;
 
     u32 color = framebuffer_pixel_color(
         (struct framebuffer_color){ .r = 0xFF, .g = 0xFF, .b = 0xFF });
-    u32 y = LINE_HEIGH * (max_lines - index);
 
-    char *char_line = (char *)line;
+    char *data = (char *)buffer;
 
-    u32 len = strlen(char_line);
-
+    u64 i = 0;
     u32 select_color = 0;
 
-    u32 i = 0;
-    u32 char_cursor = 0;
-    while (i < len)
+    s64 written = 0;
+
+    while (i < size)
     {
-        if (char_line[i] == '^')
+        if (data[i] == '^')
         {
+            /** Check the next character for the color **/
             select_color = 1;
             ++i;
             continue;
         }
 
+        /** ^ is used to change text color, the following character refer to the
+         * color **/
         if (select_color == 1)
         {
-            switch (char_line[i])
+            switch (data[i])
             {
             case 'r':
                 color = framebuffer_pixel_color((struct framebuffer_color){
@@ -217,39 +190,28 @@ static u32 console_write_line(u32 index, void *line)
                     .r = 0xFF, .g = 0xFF, .b = 0xFF });
                 break;
             default:
-                write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
-                           '^');
-                ++char_cursor;
-                write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
-                           char_line[i]);
-                ++char_cursor;
+                written += handle_char('^', color);
+
+                written += handle_char(data[i], color);
                 break;
             }
-            ++i;
 
             select_color = 0;
+            ++i;
 
             continue;
         }
 
-        write_char(CHAR_WIDTH + char_cursor * CHAR_WIDTH, y, color,
-                   char_line[i]);
-
+        written += handle_char(data[i], color);
         ++i;
-        ++char_cursor;
     }
 
-    return 1;
+    return written;
 }
 
 static s32 __flush(file_t *file)
 {
-    struct console_data *data = file->data;
-
-    framebuffer_reset();
-
-    list_for_each_rev(data->lines, console_write_line);
-
+    (void)file;
     return kflush(framebuffer_fd);
 }
 
