@@ -226,9 +226,9 @@ MAP_STATUS vascpy(vas_t *dst, vas_t *src)
     return MAP_SUCCESS;
 }
 
-static void destroy_vas_rec(struct pml_entry *entry)
+static void destroy_vas_rec(struct pml_entry *entry, u32 layer)
 {
-    if (entry == NULL)
+    if (layer >= 4)
     {
         return;
     }
@@ -236,7 +236,8 @@ static void destroy_vas_rec(struct pml_entry *entry)
     for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
     {
         destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
-            (u64)LSHIFT(entry[i].page_table_addr, 12))));
+                            (u64)LSHIFT(entry[i].page_table_addr, 12))),
+                        layer + 1);
     }
 
     kframe_free(entry, 1);
@@ -255,7 +256,8 @@ void destroy_vas(vas_t *vas)
         }
 
         destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
-            (u64)LSHIFT(pml[i].page_table_addr, 12))));
+                            (u64)LSHIFT(pml[i].page_table_addr, 12))),
+                        1);
     }
 
     kframe_free(pml, 1);
