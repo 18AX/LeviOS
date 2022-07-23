@@ -28,6 +28,13 @@
 #define SDT_SIG_XSDT "XSDT"
 #define SDT_SIG_MCFG "MCFG"
 
+#define MADT_LOCAL_APIC_PROCESSOR 0x0
+#define MADT_IO_APIC 0x1
+#define MADT_IO_APIC_INTERRUPT_OVERRIDE 0x2
+#define MADT_IO_APIC_NMI 0x3
+#define MADT_LOCAL_APIC_NMI 0x4
+#define MADT_LOCAL_APIC_ADDR_OVERRIDE 0x5
+
 struct rsdp
 {
     char signature[8];
@@ -69,6 +76,60 @@ struct rsdt
 {
     struct acpi_sdt_header header;
     u32 rsdt_table[0];
+} __attribute__((packed));
+
+struct acpi_madt_record
+{
+    u8 type;
+    u8 len;
+} __attribute__((packed));
+
+struct acpi_madt_local_apic_proc
+{
+    struct acpi_madt_record record;
+    u8 acpi_proc_id;
+    u8 apic_id;
+    u32 flags;
+} __attribute__((packed));
+
+struct acpi_madt_io_apic
+{
+    struct acpi_madt_record record;
+    u8 io_apic_id;
+    u8 reserved;
+    u32 io_apic_address;
+    u32 global_system_interrupt_base;
+} __attribute__((packed));
+
+struct acpi_madt_io_apic_interrupt_override
+{
+    struct acpi_madt_record record;
+    u8 bus_source;
+    u8 irq_source;
+    u32 global_system_interrupt;
+    u16 flags;
+} __attribute__((packed));
+
+struct acpi_madt_local_apic_nmi
+{
+    struct acpi_madt_record record;
+    u8 acpi_proc_id;
+    u16 flags;
+    u8 lint;
+} __attribute__((packed));
+
+struct acpi_madt_local_apic_addr_override
+{
+    struct acpi_madt_record record;
+    u16 reserved;
+    u64 address;
+} __attribute__((packed));
+
+struct acpi_madt
+{
+    struct acpi_sdt_header header;
+    u32 local_apic_address;
+    u32 flags;
 } __attribute__((packed));
 
 STATUS acpi_init(struct stivale2_struct *boot_info);
