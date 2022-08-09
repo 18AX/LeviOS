@@ -2,9 +2,12 @@
 #include <levi/arch/x86_64/apic.h>
 #include <levi/memory/memory.h>
 #include <levi/utils/kprintf.h>
+#include <levi/utils/string.h>
 
 static volatile u32 *local_apic = NULL;
 static volatile u32 *io_apic = NULL;
+static struct acpi_madt_local_apic_proc apic_local_cpus[LOCAL_APIC_MAX_CPU];
+static u32 apic_local_cpus_count = 0;
 
 STATUS apic_init()
 {
@@ -40,6 +43,13 @@ STATUS apic_init()
             local_apic = (volatile u32 *)phys_to_hhdm(s->address);
             break;
         }
+        case MADT_LOCAL_APIC_PROCESSOR: {
+            struct acpi_madt_local_apic_proc *s =
+                (struct acpi_madt_local_apic_proc *)record;
+
+            memcpy(&apic_local_cpus[apic_local_cpus_count++], s,
+                   sizeof(struct acpi_madt_local_apic_proc));
+        }
         default:
             break;
         }
@@ -52,7 +62,9 @@ STATUS apic_init()
         return FAILED;
     }
 
-    kprintf("local apic pointer %p io apic pointer %p\n", local_apic, io_apic);
+    kprintf(
+        "local apic pointer %p io apic pointer %p, local apic cpu count %u\n",
+        local_apic, io_apic, apic_local_cpus_count);
 
     return SUCCESS;
 }

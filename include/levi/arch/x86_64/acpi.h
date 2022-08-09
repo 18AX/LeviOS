@@ -4,6 +4,8 @@
 #include <levi/stivale2.h>
 #include <levi/types.h>
 
+#define LOCAL_APIC_MAX_CPU 16
+
 #define SDT_SIG_MADT "APIC"
 #define SDT_SIG_BGRT "BGRT"
 #define SDT_SIG_BERT "BERT"
