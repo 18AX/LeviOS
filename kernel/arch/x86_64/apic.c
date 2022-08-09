@@ -6,8 +6,8 @@
 
 static volatile u32 *local_apic = NULL;
 static volatile u32 *io_apic = NULL;
-static struct acpi_madt_local_apic_proc apic_local_cpus[LOCAL_APIC_MAX_CPU];
-static u32 apic_local_cpus_count = 0;
+static struct acpi_madt_local_apic_proc lapic_cpus[LOCAL_APIC_MAX_CPU];
+static u32 lapic_cpus_count = 0;
 
 STATUS apic_init()
 {
@@ -29,7 +29,6 @@ STATUS apic_init()
 
     while ((record = (struct acpi_madt_record *)madt_records)->len != 0)
     {
-        kprintf("recored type : %d len %d\n", record->type, record->len);
         switch (record->type)
         {
         case MADT_IO_APIC: {
@@ -47,7 +46,7 @@ STATUS apic_init()
             struct acpi_madt_local_apic_proc *s =
                 (struct acpi_madt_local_apic_proc *)record;
 
-            memcpy(&apic_local_cpus[apic_local_cpus_count++], s,
+            memcpy(&lapic_cpus[lapic_cpus_count++], s,
                    sizeof(struct acpi_madt_local_apic_proc));
         }
         default:
@@ -64,7 +63,7 @@ STATUS apic_init()
 
     kprintf(
         "local apic pointer %p io apic pointer %p, local apic cpu count %u\n",
-        local_apic, io_apic, apic_local_cpus_count);
+        local_apic, io_apic, lapic_cpus_count);
 
     return SUCCESS;
 }
@@ -87,4 +86,21 @@ void ioapic_write(u32 reg, u32 data)
 u32 ioapic_read(u32 reg)
 {
     return io_apic[reg];
+}
+
+u32 lapic_cpu_count()
+{
+    return lapic_cpus_count;
+}
+
+STATUS lapic_cpu_info(u8 cpuid, struct acpi_madt_local_apic_proc *res)
+{
+    if (cpuid >= lapic_cpus_count)
+    {
+        return FAILED;
+    }
+
+    memcpy(res, &lapic_cpus[cpuid], sizeof(struct acpi_madt_local_apic_proc));
+
+    return SUCCESS;
 }
