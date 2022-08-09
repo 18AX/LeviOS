@@ -9,4 +9,8 @@ void lapic_write(u32 reg, u32 data);
 
 u32 lapic_read(u32 reg);
 
+void ioapic_write(u32 reg, u32 data);
+
+u32 ioapic_read(u32 reg);
+
 #endif

@@ -4,6 +4,7 @@
 #include <levi/utils/kprintf.h>
 
 static volatile u32 *local_apic = NULL;
+static volatile u32 *io_apic = NULL;
 
 STATUS apic_init()
 {
@@ -28,6 +29,11 @@ STATUS apic_init()
         kprintf("recored type : %d len %d\n", record->type, record->len);
         switch (record->type)
         {
+        case MADT_IO_APIC: {
+            struct acpi_madt_io_apic *s = (struct acpi_madt_io_apic *)record;
+            io_apic = (volatile u32 *)phys_to_hhdm((u64)s->io_apic_address);
+            break;
+        }
         case MADT_LOCAL_APIC_ADDR_OVERRIDE: {
             struct acpi_madt_local_apic_addr_override *s =
                 (struct acpi_madt_local_apic_addr_override *)record;
@@ -41,7 +47,12 @@ STATUS apic_init()
         madt_records += record->len;
     }
 
-    kprintf("local apic pointer %p\n", local_apic);
+    if (local_apic == NULL || io_apic == NULL)
+    {
+        return FAILED;
+    }
+
+    kprintf("local apic pointer %p io apic pointer %p\n", local_apic, io_apic);
 
     return SUCCESS;
 }
@@ -54,4 +65,14 @@ void lapic_write(u32 reg, u32 data)
 u32 lapic_read(u32 reg)
 {
     return local_apic[reg];
+}
+
+void ioapic_write(u32 reg, u32 data)
+{
+    io_apic[reg] = data;
+}
+
+u32 ioapic_read(u32 reg)
+{
+    return io_apic[reg];
 }
