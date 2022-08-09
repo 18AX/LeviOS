@@ -23,6 +23,6 @@ u32 lapic_cpu_count(void);
  * @param res
  * @return STATUS
  */
-STATUS lapic_cpu_info(u8 cpuid, struct acpi_madt_local_apic_proc *res);
+STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res);
 
 #endif

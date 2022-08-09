@@ -6,12 +6,12 @@
 
 static volatile u32 *local_apic = NULL;
 static volatile u32 *io_apic = NULL;
-static struct acpi_madt_local_apic_proc lapic_cpus[LOCAL_APIC_MAX_CPU];
+static struct madt_lapic_proc lapic_cpus[LOCAL_APIC_MAX_CPU];
 static u32 lapic_cpus_count = 0;
 
 STATUS apic_init()
 {
-    struct acpi_madt *madt = (struct acpi_madt *)sdt_find(SDT_SIG_MADT);
+    struct madt_header *madt = (struct madt_header *)sdt_find(SDT_SIG_MADT);
 
     if (madt == NULL)
     {
@@ -22,32 +22,31 @@ STATUS apic_init()
 
     u8 *madt_records = (u8 *)(madt + 1);
 
-    struct acpi_madt_record *record = NULL;
+    struct madt_record *record = NULL;
 
     kprintf("apic pointer %p local apic address %lx\n", madt,
             (u64)madt->local_apic_address);
 
-    while ((record = (struct acpi_madt_record *)madt_records)->len != 0)
+    while ((record = (struct madt_record *)madt_records)->len != 0)
     {
         switch (record->type)
         {
         case MADT_IO_APIC: {
-            struct acpi_madt_io_apic *s = (struct acpi_madt_io_apic *)record;
+            struct madt_ioapic *s = (struct madt_ioapic *)record;
             io_apic = (volatile u32 *)phys_to_hhdm((u64)s->io_apic_address);
             break;
         }
         case MADT_LOCAL_APIC_ADDR_OVERRIDE: {
-            struct acpi_madt_local_apic_addr_override *s =
-                (struct acpi_madt_local_apic_addr_override *)record;
+            struct madt_lapic_addr_override *s =
+                (struct madt_lapic_addr_override *)record;
             local_apic = (volatile u32 *)phys_to_hhdm(s->address);
             break;
         }
         case MADT_LOCAL_APIC_PROCESSOR: {
-            struct acpi_madt_local_apic_proc *s =
-                (struct acpi_madt_local_apic_proc *)record;
+            struct madt_lapic_proc *s = (struct madt_lapic_proc *)record;
 
             memcpy(&lapic_cpus[lapic_cpus_count++], s,
-                   sizeof(struct acpi_madt_local_apic_proc));
+                   sizeof(struct madt_lapic_proc));
         }
         default:
             break;
@@ -93,14 +92,14 @@ u32 lapic_cpu_count()
     return lapic_cpus_count;
 }
 
-STATUS lapic_cpu_info(u8 cpuid, struct acpi_madt_local_apic_proc *res)
+STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res)
 {
     if (cpuid >= lapic_cpus_count)
     {
         return FAILED;
     }
 
-    memcpy(res, &lapic_cpus[cpuid], sizeof(struct acpi_madt_local_apic_proc));
+    memcpy(res, &lapic_cpus[cpuid], sizeof(struct madt_lapic_proc));
 
     return SUCCESS;
 }
