@@ -4,6 +4,10 @@
 #include <levi/arch/x86_64/acpi.h>
 #include <levi/types.h>
 
+#define CPUID_LAPIC_FEATURE (1 << 9)
+#define MSR_APIC_BASE_ENABLE (1 << 11)
+#define SPURIOUS_VECTOR_APIC_ENABLE (1 << 8)
+
 #define LAPIC_ID 0x20
 #define LAPIC_VERSION 0x30
 #define LAPIC_TASK_PRIORITY 0x80
@@ -26,6 +30,8 @@
 #define LAPIC_TIMER_DIVIDE_CONF 0x3E0
 
 STATUS apic_init(void);
+
+void apic_enable(void);
 
 void lapic_write(u32 reg, u32 data);
 

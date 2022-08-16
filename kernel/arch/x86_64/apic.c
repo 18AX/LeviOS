@@ -1,5 +1,7 @@
 #include <levi/arch/x86_64/acpi.h>
 #include <levi/arch/x86_64/apic.h>
+#include <levi/arch/x86_64/cpuregs.h>
+#include <levi/arch/x86_64/msr.h>
 #include <levi/memory/memory.h>
 #include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
@@ -9,8 +11,28 @@ static volatile u32 *io_apic = NULL;
 static struct madt_lapic_proc lapic_cpus[LOCAL_APIC_MAX_CPU];
 static u32 lapic_cpus_count = 0;
 
+static STATUS apic_check_lapic(void)
+{
+    u32 eax, ebx, ecx, edx = 0;
+
+    cpuid(0, &eax, &ebx, &ecx, &edx);
+
+    if ((edx & CPUID_LAPIC_FEATURE) == 0)
+    {
+        return FAILED;
+    }
+
+    return SUCCESS;
+}
+
 STATUS apic_init()
 {
+    /** Checking for the presence of local apic **/
+    if (apic_check_lapic() == FAILED)
+    {
+        return SUCCESS;
+    }
+
     struct madt_header *madt = (struct madt_header *)sdt_find(SDT_SIG_MADT);
 
     if (madt == NULL)
@@ -24,9 +46,7 @@ STATUS apic_init()
 
     struct madt_record *record = NULL;
 
-    kprintf("apic pointer %p local apic address %lx\n", madt,
-            (u64)madt->local_apic_address);
-
+    /** We are looking for the address of the io apic and the local apic. **/
     while ((record = (struct madt_record *)madt_records)->len != 0)
     {
         switch (record->type)
@@ -68,6 +88,20 @@ STATUS apic_init()
         local_apic, io_apic, lapic_cpus_count);
 
     return SUCCESS;
+}
+
+void apic_enable()
+{
+    /** bit 11 is APIC global enable/disable and we don't want to override the
+     * base address of the local apic **/
+    u64 msr_value = rdmsr64(MSR_IA32_APIC_BASE);
+    msr_value |= MSR_APIC_BASE_ENABLE;
+    wrmsr64(MSR_IA32_APIC_BASE, msr_value);
+
+    /** Bit 8 of the spurious interrupt vector can enable/disable apic **/
+    u64 spurious_reg_value = lapic_read(LAPIC_SPURIOUS_INTERRUPT_VECTOR);
+    spurious_reg_value |= SPURIOUS_VECTOR_APIC_ENABLE;
+    lapic_write(LAPIC_SPURIOUS_INTERRUPT_VECTOR, spurious_reg_value);
 }
 
 void lapic_write(u32 reg, u32 data)

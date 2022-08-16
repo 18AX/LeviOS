@@ -123,6 +123,7 @@ void main(struct stivale2_struct *boot_info)
     kprintf("[^cinfo^w] Kernel initialized\n");
 
     apic_init();
+    apic_enable();
 
     u32 module_loaded = module_init(boot_info);
 
