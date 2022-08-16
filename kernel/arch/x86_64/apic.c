@@ -45,8 +45,11 @@ STATUS apic_init()
         case MADT_LOCAL_APIC_PROCESSOR: {
             struct madt_lapic_proc *s = (struct madt_lapic_proc *)record;
 
-            memcpy(&lapic_cpus[lapic_cpus_count++], s,
-                   sizeof(struct madt_lapic_proc));
+            if (lapic_cpus_count + 1 < LOCAL_APIC_MAX_CPU)
+            {
+                memcpy(&lapic_cpus[lapic_cpus_count++], s,
+                       sizeof(struct madt_lapic_proc));
+            }
         }
         default:
             break;
@@ -102,4 +105,9 @@ STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res)
     memcpy(res, &lapic_cpus[cpuid], sizeof(struct madt_lapic_proc));
 
     return SUCCESS;
+}
+
+void lapic_eoi(void)
+{
+    local_apic[LAPIC_EOI] = 0x0;
 }

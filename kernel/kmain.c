@@ -100,6 +100,8 @@ static STATUS init(struct stivale2_struct *boot_info)
     return SUCCESS;
 }
 
+#include <levi/arch/x86_64/apic.h>
+
 void main(struct stivale2_struct *boot_info)
 {
     if (early_init(boot_info) == FAILED)
@@ -118,6 +120,8 @@ void main(struct stivale2_struct *boot_info)
     }
 
     kprintf("[^cinfo^w] Kernel initialized\n");
+
+    apic_init();
 
     u32 module_loaded = module_init(boot_info);
 
