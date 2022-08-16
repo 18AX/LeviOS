@@ -15,8 +15,9 @@
 #define LAPIC_SPURIOUS_INTERRUPT_VECTOR 0xF0
 #define LAPIC_LVT_TIMER 0x320
 #define LAPIC_LVT_THERMAL_SENSOR 0x330
-#define LAPIC_LVT_PMC 0x340 /** LVT Performance Monitoring Counters Register   \
-                               **/
+#define LAPIC_LVT_PMC                                                          \
+    0x340 /** LVT Performance Monitoring Counters Register                     \
+           **/
 #define LAPIC_LVT_LINT0 0x350
 #define LAPIC_LVT_LINT1 0x360
 #define LAPIC_LVT_ERROR 0x370

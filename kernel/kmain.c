@@ -101,6 +101,7 @@ static STATUS init(struct stivale2_struct *boot_info)
 }
 
 #include <levi/arch/x86_64/apic.h>
+#include <levi/arch/x86_64/cpuregs.h>
 
 void main(struct stivale2_struct *boot_info)
 {
@@ -130,6 +131,10 @@ void main(struct stivale2_struct *boot_info)
     kprintf("[^g ok ^w] Welcome to LeviOS\n");
 
     kprintf("[^cinfo^w] Start memfs:init\n");
+
+    char manufacturer_id[CPUID_MANUFACTURER_ID_LEN];
+    cpuid_manufacturer_id(manufacturer_id);
+    kprintf("cpuid %s\n", manufacturer_id);
 
     if (run_init(boot_info) == FAILED)
     {
