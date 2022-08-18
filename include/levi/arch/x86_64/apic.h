@@ -4,9 +4,18 @@
 #include <levi/arch/x86_64/acpi.h>
 #include <levi/types.h>
 
+#define IOAPIC_TRIGGER_LOW (1)
+#define IOAPIC_TRIGGER_HIGH (1 << 1)
+#define IOAPIC_TRIGGER_EDGE (1 << 2)
+#define IOAPIC_TRIGGER_LEVEL (1 << 3)
+#define IOAPIC_INTERRUPT_MASK_SET (1 << 4)
+
 #define CPUID_LAPIC_FEATURE (1 << 9)
 #define MSR_APIC_BASE_ENABLE (1 << 11)
 #define SPURIOUS_VECTOR_APIC_ENABLE (1 << 8)
+
+#define IO_REDIRECTION_TABLE_BASE 0x10
+#define IO_REDIRECTION_TABLE_SIZE 0x17
 
 #define LAPIC_ID 0x20
 #define LAPIC_VERSION 0x30
@@ -28,6 +37,32 @@
 #define LAPIC_TIMER_INITIAL_COUNT 0x380
 #define LAPIC_TIMER_CURRENT_COUNT 0x390
 #define LAPIC_TIMER_DIVIDE_CONF 0x3E0
+
+struct apic_redirection
+{
+    union
+    {
+        struct
+        {
+            u8 interrupt_vector;
+            u8 delivery_mode : 3;
+            u8 destination_mode : 1;
+            u8 delivery_status : 1;
+            u8 polarity : 1;
+            u8 remote_irr : 1;
+            u8 trigger_mode : 1;
+            u8 interrupt_mask : 1;
+            u64 reserved : 39;
+            u8 destination_field;
+        } __attribute__((packed));
+
+        struct
+        {
+            u32 low;
+            u32 high;
+        } __attribute__((packed));
+    };
+} __attribute__((packed));
 
 STATUS apic_init(void);
 
@@ -51,6 +86,16 @@ u32 lapic_cpu_count(void);
  * @return STATUS
  */
 STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res);
+
+/**
+ * @brief Enable an irq by creating a redirection to the specified cpu.
+ *
+ * @param cpuid
+ * @param apic_pin
+ * @param interrupts_vector
+ * @param flags
+ */
+STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags);
 
 void lapic_eoi(void);
 

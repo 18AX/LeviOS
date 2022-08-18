@@ -6,9 +6,15 @@
 #include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
 
-static volatile u32 *local_apic = NULL;
-static volatile u32 *io_apic = NULL;
-static struct madt_lapic_proc lapic_cpus[LOCAL_APIC_MAX_CPU];
+static volatile u32 *lapic_ptr = NULL;
+
+static volatile u32 *ioapic_ptr = NULL;
+static u32 ioapic_global_interrupt_base = 0;
+
+static struct madt_ioapic_interrupt_override
+    interrupts_override[IO_REDIRECTION_TABLE_SIZE] = { 0 };
+
+static struct madt_lapic_proc lapic_cpus[LOCAL_APIC_MAX_CPU] = { 0 };
 static u32 lapic_cpus_count = 0;
 
 static STATUS apic_check_lapic(void)
@@ -40,26 +46,29 @@ STATUS apic_init()
         return FAILED;
     }
 
-    local_apic = (volatile u32 *)phys_to_hhdm(((u64)madt->local_apic_address));
+    lapic_ptr = (volatile u32 *)phys_to_hhdm(((u64)madt->local_apic_address));
 
     u8 *madt_records = (u8 *)(madt + 1);
 
     struct madt_record *record = NULL;
 
-    /** We are looking for the address of the io apic and the local apic. **/
+    /** We are looking for the address of the io apic, the local apic, lapic
+     * cpus and apic irq overrides. **/
     while ((record = (struct madt_record *)madt_records)->len != 0)
     {
         switch (record->type)
         {
         case MADT_IO_APIC: {
             struct madt_ioapic *s = (struct madt_ioapic *)record;
-            io_apic = (volatile u32 *)phys_to_hhdm((u64)s->io_apic_address);
+
+            ioapic_ptr = (volatile u32 *)phys_to_hhdm((u64)s->io_apic_address);
+            ioapic_global_interrupt_base = s->global_system_interrupt_base;
             break;
         }
         case MADT_LOCAL_APIC_ADDR_OVERRIDE: {
             struct madt_lapic_addr_override *s =
                 (struct madt_lapic_addr_override *)record;
-            local_apic = (volatile u32 *)phys_to_hhdm(s->address);
+            lapic_ptr = (volatile u32 *)phys_to_hhdm(s->address);
             break;
         }
         case MADT_LOCAL_APIC_PROCESSOR: {
@@ -70,6 +79,15 @@ STATUS apic_init()
                 memcpy(&lapic_cpus[lapic_cpus_count++], s,
                        sizeof(struct madt_lapic_proc));
             }
+            break;
+        }
+        case MADT_IO_APIC_INTERRUPT_OVERRIDE: {
+            struct madt_ioapic_interrupt_override *s =
+                (struct madt_ioapic_interrupt_override *)record;
+
+            memcpy(&interrupts_override[s->irq_source], s,
+                   sizeof(struct madt_ioapic_interrupt_override));
+            break;
         }
         default:
             break;
@@ -78,14 +96,15 @@ STATUS apic_init()
         madt_records += record->len;
     }
 
-    if (local_apic == NULL || io_apic == NULL)
+    if (lapic_ptr == NULL || ioapic_ptr == NULL)
     {
         return FAILED;
     }
 
-    kprintf(
-        "local apic pointer %p io apic pointer %p, local apic cpu count %u\n",
-        local_apic, io_apic, lapic_cpus_count);
+    kprintf("local apic pointer %p io apic pointer %p, local apic cpu count %u "
+            "global base %x\n",
+            lapic_ptr, ioapic_ptr, lapic_cpus_count,
+            ioapic_global_interrupt_base);
 
     return SUCCESS;
 }
@@ -106,22 +125,24 @@ void apic_enable()
 
 void lapic_write(u32 reg, u32 data)
 {
-    local_apic[reg] = data;
+    lapic_ptr[reg] = data;
 }
 
 u32 lapic_read(u32 reg)
 {
-    return local_apic[reg];
+    return lapic_ptr[reg];
 }
 
 void ioapic_write(u32 reg, u32 data)
 {
-    io_apic[reg] = data;
+    ioapic_ptr[0] = reg;
+    ioapic_ptr[4] = data;
 }
 
 u32 ioapic_read(u32 reg)
 {
-    return io_apic[reg];
+    ioapic_ptr[0] = reg;
+    return ioapic_ptr[4];
 }
 
 u32 lapic_cpu_count()
@@ -141,7 +162,55 @@ STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res)
     return SUCCESS;
 }
 
+STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
+{
+    if (apic_pin >= IO_REDIRECTION_TABLE_SIZE || cpuid >= lapic_cpus_count)
+    {
+        return FAILED;
+    }
+
+    struct apic_redirection redirection = { 0 };
+    redirection.destination_field = lapic_cpus[cpuid].apic_id;
+    redirection.interrupt_vector = interrupts_vector;
+
+    if ((flags & IOAPIC_TRIGGER_HIGH) != 0)
+    {
+        redirection.polarity = 0;
+    }
+
+    if ((flags & IOAPIC_TRIGGER_LOW) != 0)
+    {
+        redirection.polarity = 1;
+    }
+
+    if ((flags & IOAPIC_TRIGGER_LEVEL) != 0)
+    {
+        redirection.trigger_mode = 1;
+    }
+
+    if ((flags & IOAPIC_TRIGGER_EDGE) != 0)
+    {
+        redirection.trigger_mode = 0;
+    }
+
+    if ((flags & IOAPIC_INTERRUPT_MASK_SET) != 0)
+    {
+        redirection.interrupt_mask = 1;
+    }
+
+    /** x << 1 = x * 2 the structure needs to be written on two entries **/
+    u32 offset = (IO_REDIRECTION_TABLE_BASE
+                  + interrupts_override[apic_pin].global_system_interrupt
+                  - ioapic_global_interrupt_base)
+        << 1;
+
+    ioapic_write(offset, redirection.low);
+    ioapic_write(offset + 1, redirection.high);
+
+    return SUCCESS;
+}
+
 void lapic_eoi(void)
 {
-    local_apic[LAPIC_EOI] = 0x0;
+    lapic_ptr[LAPIC_EOI] = 0x0;
 }
