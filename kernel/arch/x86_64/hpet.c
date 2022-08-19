@@ -7,8 +7,6 @@ static u64 hpet_period = 0;
 static u64 hpet_min_ticks = 0;
 static struct hpet_general_configuration hpet_general_conf = { 0 };
 
-#include <levi/utils/kprintf.h>
-
 STATUS hpet_init()
 {
     struct hpet_header *header = (struct hpet_header *)sdt_find(SDT_SIG_HPET);
@@ -33,8 +31,6 @@ STATUS hpet_init()
     raw = hpet_read(HPET_GENERAL_CONFIGURATION);
 
     hpet_general_conf.raw = raw;
-
-    kprintf("hpet freq: %ld\n", hpet_period);
 
     return SUCCESS;
 }
