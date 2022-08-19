@@ -102,6 +102,7 @@ static STATUS init(struct stivale2_struct *boot_info)
 
 #include <levi/arch/x86_64/apic.h>
 #include <levi/arch/x86_64/cpuregs.h>
+#include <levi/arch/x86_64/hpet.h>
 
 void main(struct stivale2_struct *boot_info)
 {
@@ -122,6 +123,19 @@ void main(struct stivale2_struct *boot_info)
 
     kprintf("[^cinfo^w] Kernel initialized\n");
 
+    if (hpet_init() == SUCCESS)
+    {
+        kprintf("HPET SUCCESS\n");
+    }
+    hpet_reset();
+
+    kprintf("READY TO WAIT\n");
+
+    u64 ticks = hpet_ticks_from_ms(10000);
+
+    kprintf("tick %ld\n", ticks);
+
+    hpet_wait(ticks);
     apic_init();
     apic_enable();
 

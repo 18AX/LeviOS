@@ -29,6 +29,7 @@
 #define SDT_SIG_SSDT "SSDT"
 #define SDT_SIG_XSDT "XSDT"
 #define SDT_SIG_MCFG "MCFG"
+#define SDT_SIG_HPET "HPET"
 
 #define MADT_LOCAL_APIC_PROCESSOR 0x0
 #define MADT_IO_APIC 0x1
@@ -132,6 +133,25 @@ struct madt_header
     struct acpi_sdt_header header;
     u32 local_apic_address;
     u32 flags;
+} __attribute__((packed));
+
+struct hpet_header
+{
+    struct acpi_sdt_header header;
+    u8 hardware_rev_id;
+    u8 comparator_count : 5;
+    u8 counter_size : 1;
+    u8 reserved0 : 1;
+    u8 legacy_replacement : 1;
+    u16 pci_vendor_id;
+    u8 address_space_id;
+    u8 register_bit_width;
+    u8 register_bit_offset;
+    u8 reserved1;
+    u64 address;
+    u8 hpet_number;
+    u16 minimum_tick;
+    u8 page_protection;
 } __attribute__((packed));
 
 STATUS acpi_init(struct stivale2_struct *boot_info);
