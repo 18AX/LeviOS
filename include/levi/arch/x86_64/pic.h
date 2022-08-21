@@ -14,12 +14,6 @@
 #define IRQ_MASK 0x1
 #define IRQ_UNMASK 0x0
 
-#include "levi/types.h"
-
-void pic_init(void);
-
-void pic_eoi(u8 pic);
-
-void pic_set_irq(u8 pic, u8 irq, u8 state);
+void pic_disable(void);
 
 #endif

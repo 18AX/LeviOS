@@ -1,12 +1,13 @@
 #include <levi/arch/x86_64/acpi.h>
 #include <levi/arch/x86_64/apic.h>
 #include <levi/arch/x86_64/cpuregs.h>
+#include <levi/arch/x86_64/hpet.h>
 #include <levi/arch/x86_64/msr.h>
+#include <levi/interrupts/interrupts.h>
 #include <levi/memory/memory.h>
-#include <levi/utils/kprintf.h>
 #include <levi/utils/string.h>
 
-static volatile u32 *lapic_ptr = NULL;
+static volatile u8 *lapic_ptr = NULL;
 
 static volatile u32 *ioapic_ptr = NULL;
 static u32 ioapic_global_interrupt_base = 0;
@@ -16,6 +17,10 @@ static struct madt_ioapic_interrupt_override
 
 static struct madt_lapic_proc lapic_cpus[LOCAL_APIC_MAX_CPU] = { 0 };
 static u32 lapic_cpus_count = 0;
+static u8 ioapic_max_redirections = 0;
+
+/** Number of ticks during 1 ms **/
+static u32 lapic_timer_ticks = 0;
 
 static STATUS apic_check_lapic(void)
 {
@@ -46,7 +51,7 @@ STATUS apic_init()
         return FAILED;
     }
 
-    lapic_ptr = (volatile u32 *)phys_to_hhdm(((u64)madt->local_apic_address));
+    lapic_ptr = (volatile u8 *)phys_to_hhdm(((u64)madt->local_apic_address));
 
     u8 *madt_records = (u8 *)(madt + 1);
 
@@ -68,7 +73,7 @@ STATUS apic_init()
         case MADT_LOCAL_APIC_ADDR_OVERRIDE: {
             struct madt_lapic_addr_override *s =
                 (struct madt_lapic_addr_override *)record;
-            lapic_ptr = (volatile u32 *)phys_to_hhdm(s->address);
+            lapic_ptr = (volatile u8 *)phys_to_hhdm(s->address);
             break;
         }
         case MADT_LOCAL_APIC_PROCESSOR: {
@@ -101,10 +106,21 @@ STATUS apic_init()
         return FAILED;
     }
 
-    kprintf("local apic pointer %p io apic pointer %p, local apic cpu count %u "
-            "global base %x\n",
-            lapic_ptr, ioapic_ptr, lapic_cpus_count,
-            ioapic_global_interrupt_base);
+    /** Disable all the local vector table **/
+    lapic_write(LAPIC_LVT_CMCI, LAPIC_LVT_DISABLE);
+    lapic_write(LAPIC_LVT_TIMER, LAPIC_LVT_DISABLE);
+    lapic_write(LAPIC_LVT_THERMAL_SENSOR, LAPIC_LVT_DISABLE);
+    lapic_write(LAPIC_LVT_LINT0, LAPIC_LVT_DISABLE);
+    lapic_write(LAPIC_LVT_LINT1, LAPIC_LVT_DISABLE);
+    lapic_write(LAPIC_LVT_PMC, LAPIC_LVT_NMI);
+
+    ioapic_max_redirections = (ioapic_read(0x1) >> 16) & 0xFF;
+
+    for (u64 i = 0; i < ioapic_max_redirections; ++i)
+    {
+        ioapic_irq_set(0, i, 0,
+                       IOAPIC_INTERRUPT_MASK_SET | IOAPIC_TRIGGER_EDGE);
+    }
 
     return SUCCESS;
 }
@@ -125,12 +141,12 @@ void apic_enable()
 
 void lapic_write(u32 reg, u32 data)
 {
-    lapic_ptr[reg] = data;
+    *((volatile u32 *)&lapic_ptr[reg]) = data;
 }
 
 u32 lapic_read(u32 reg)
 {
-    return lapic_ptr[reg];
+    return *((volatile u32 *)&lapic_ptr[reg]);
 }
 
 void ioapic_write(u32 reg, u32 data)
@@ -164,7 +180,7 @@ STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res)
 
 STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
 {
-    if (apic_pin >= IO_REDIRECTION_TABLE_SIZE || cpuid >= lapic_cpus_count)
+    if (apic_pin >= ioapic_max_redirections || cpuid >= lapic_cpus_count)
     {
         return FAILED;
     }
@@ -199,13 +215,12 @@ STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
     }
 
     /** x << 1 = x * 2 the structure needs to be written on two entries **/
-    u32 offset = (IO_REDIRECTION_TABLE_BASE
-                  + interrupts_override[apic_pin].global_system_interrupt
+    u32 offset = (interrupts_override[apic_pin].global_system_interrupt
                   - ioapic_global_interrupt_base)
         << 1;
 
-    ioapic_write(offset, redirection.low);
-    ioapic_write(offset + 1, redirection.high);
+    ioapic_write(IO_REDIRECTION_TABLE_BASE + offset, redirection.low);
+    ioapic_write(IO_REDIRECTION_TABLE_BASE + offset + 1, redirection.high);
 
     return SUCCESS;
 }
@@ -213,4 +228,37 @@ STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
 void lapic_eoi(void)
 {
     lapic_ptr[LAPIC_EOI] = 0x0;
+}
+
+STATUS lapic_timer_init(void)
+{
+    /** We need to configure the lapic timer using an external timer because
+     * lapic timer frequency depends on core clk frequency **/
+    hpet_reset();
+    u64 hpet_ticks = hpet_ticks_from_ms(1);
+
+    lapic_write(LAPIC_TIMER_DIVIDE_CONF, 0x3); /** Clk freq divided by 16 **/
+    lapic_write(LAPIC_LVT_TIMER, LAPIC_LVT_TIMER_ONESHOT | LAPIC_LVT_VECTOR(0));
+    lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0xFFFFFFFF);
+
+    hpet_wait(hpet_ticks);
+    lapic_write(LAPIC_LVT_TIMER, LAPIC_LVT_DISABLE);
+
+    lapic_timer_ticks = 0xFFFFFFFF - lapic_read(LAPIC_TIMER_CURRENT_COUNT);
+
+    lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0x0);
+
+    ioapic_irq_set(0, 0, INTERRUPTS_TIMER_OFFSET,
+                   IOAPIC_TRIGGER_HIGH | IOAPIC_TRIGGER_EDGE);
+
+    lapic_write(LAPIC_LVT_TIMER,
+                LAPIC_LVT_TIMER_ONESHOT
+                    | LAPIC_LVT_VECTOR(INTERRUPTS_TIMER_OFFSET));
+
+    return SUCCESS;
+}
+
+void lapic_timer_set(u32 ms)
+{
+    lapic_write(LAPIC_TIMER_INITIAL_COUNT, ms * lapic_timer_ticks);
 }

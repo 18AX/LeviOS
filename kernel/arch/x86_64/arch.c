@@ -1,6 +1,8 @@
 #include <levi/arch.h>
 #include <levi/arch/x86_64/acpi.h>
+#include <levi/arch/x86_64/apic.h>
 #include <levi/arch/x86_64/gdt.h>
+#include <levi/arch/x86_64/hpet.h>
 #include <levi/arch/x86_64/idt.h>
 #include <levi/arch/x86_64/pci.h>
 #include <levi/arch/x86_64/pic.h>
@@ -18,8 +20,27 @@ STATUS arch_init(struct stivale2_struct *boot_info)
     {
         return FAILED;
     }
-    // This will be probably be replaced with apic.
-    pic_init();
+
+    if (hpet_init() == FAILED)
+    {
+        return FAILED;
+    }
+
+    // disable_pic();
+    //  This will be probably be replaced with apic.
+    pic_disable();
+
+    if (apic_init() == FAILED)
+    {
+        return FAILED;
+    }
+
+    apic_enable();
+
+    if (lapic_timer_init() == FAILED)
+    {
+        return FAILED;
+    }
 
 #if 0
     if (pci_init() == FAILED)

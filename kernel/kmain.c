@@ -101,8 +101,6 @@ static STATUS init(struct stivale2_struct *boot_info)
 }
 
 #include <levi/arch/x86_64/apic.h>
-#include <levi/arch/x86_64/cpuregs.h>
-#include <levi/arch/x86_64/hpet.h>
 
 void main(struct stivale2_struct *boot_info)
 {
@@ -123,21 +121,8 @@ void main(struct stivale2_struct *boot_info)
 
     kprintf("[^cinfo^w] Kernel initialized\n");
 
-    if (hpet_init() == SUCCESS)
-    {
-        kprintf("HPET SUCCESS\n");
-    }
-    hpet_reset();
-
-    kprintf("READY TO WAIT\n");
-
-    u64 ticks = hpet_ticks_from_ms(10000);
-
-    kprintf("tick %ld\n", ticks);
-
-    hpet_wait(ticks);
-    apic_init();
-    apic_enable();
+    interrupts_enable();
+    lapic_timer_set(100);
 
     u32 module_loaded = module_init(boot_info);
 
@@ -146,10 +131,6 @@ void main(struct stivale2_struct *boot_info)
     kprintf("[^g ok ^w] Welcome to LeviOS\n");
 
     kprintf("[^cinfo^w] Start memfs:init\n");
-
-    char manufacturer_id[CPUID_MANUFACTURER_ID_LEN];
-    cpuid_manufacturer_id(manufacturer_id);
-    kprintf("cpuid %s\n", manufacturer_id);
 
     if (run_init(boot_info) == FAILED)
     {

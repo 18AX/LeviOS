@@ -43,11 +43,11 @@ static void irq_handler(u64 id, u64 error_code, proc_t *proc)
         on_key_release(translate_to_keycode(key));
     }
 
-    pic_eoi(PIC_MASTER_A);
+    // pic_eoi(PIC_MASTER_A);
 }
 
 void intel8042_init()
 {
     register_interrupt_handler(PIC_MASTER_OFFSET + 1, irq_handler);
-    pic_set_irq(PIC_MASTER_B, 0x1, IRQ_UNMASK);
+    // pic_set_irq(PIC_MASTER_B, 0x1, IRQ_UNMASK);
 }

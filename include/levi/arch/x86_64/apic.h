@@ -26,6 +26,7 @@
 #define LAPIC_REMOTE_READ 0xC0
 #define LAPIC_LOGICAL_DESTINATION 0xD0
 #define LAPIC_SPURIOUS_INTERRUPT_VECTOR 0xF0
+#define LAPIC_LVT_CMCI 0x2F0
 #define LAPIC_LVT_TIMER 0x320
 #define LAPIC_LVT_THERMAL_SENSOR 0x330
 #define LAPIC_LVT_PMC                                                          \
@@ -37,6 +38,14 @@
 #define LAPIC_TIMER_INITIAL_COUNT 0x380
 #define LAPIC_TIMER_CURRENT_COUNT 0x390
 #define LAPIC_TIMER_DIVIDE_CONF 0x3E0
+
+#define LAPIC_LVT_VECTOR(N) (N & 0xFF)
+#define LAPIC_LVT_NMI (1 << 10)
+#define LAPIC_LVT_DISABLE (1 << 16)
+#define LAPIC_LVT_DELIVERY_PENDING (1 << 12)
+
+#define LAPIC_LVT_TIMER_ONESHOT 0x0
+#define LAPIC_LVT_TIMER_PERIODIC 0x1
 
 struct apic_redirection
 {
@@ -98,5 +107,9 @@ STATUS lapic_cpu_info(u8 cpuid, struct madt_lapic_proc *res);
 STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags);
 
 void lapic_eoi(void);
+
+STATUS lapic_timer_init(void);
+
+void lapic_timer_set(u32 ms);
 
 #endif

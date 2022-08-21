@@ -5,6 +5,7 @@
 #include <levi/proc/process.h>
 
 #define INTERRUPTS_NUMBER 0xFF
+#define INTERRUPTS_TIMER_OFFSET 0x30
 
 typedef void (*interrupt_handler_t)(u64 id, u64 error_code, proc_t *proc);
 
