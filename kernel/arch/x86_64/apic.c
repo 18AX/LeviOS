@@ -240,7 +240,7 @@ STATUS lapic_timer_init(void)
     u64 hpet_ticks = hpet_ticks_from_ms(1);
 
     lapic_write(LAPIC_TIMER_DIVIDE_CONF, 0x3); /** Clk freq divided by 16 **/
-    lapic_write(LAPIC_LVT_TIMER, LAPIC_LVT_TIMER_ONESHOT | LAPIC_LVT_VECTOR(0));
+    lapic_write(LAPIC_LVT_TIMER, LAPIC_LVT_TIMER_PERIODIC | LAPIC_LVT_VECTOR(0));
     lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0xFFFFFFFF);
 
     hpet_wait(hpet_ticks);
@@ -251,7 +251,7 @@ STATUS lapic_timer_init(void)
     lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0x0);
 
     lapic_write(LAPIC_LVT_TIMER,
-                LAPIC_LVT_TIMER_ONESHOT
+                LAPIC_LVT_TIMER_PERIODIC
                     | LAPIC_LVT_VECTOR(INTERRUPTS_TIMER_OFFSET));
 
     return SUCCESS;
