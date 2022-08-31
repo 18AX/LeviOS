@@ -156,3 +156,43 @@ void list_destroy(struct list *list, void (*free_func)(void *))
 
     kfree(list);
 }
+
+void list_remove_all(struct list *list, void *element)
+{
+    if (list == NULL)
+    {
+        return;
+    }
+
+    struct list_element *current = list->head;
+
+    while (current != NULL)
+    {
+        if (current->data == element)
+        {
+            /** It's the head of the list **/
+            if (current->prev == NULL)
+            {
+                list->head = current->next;
+            }
+            else
+            {
+                current->prev->next = current->next;
+            }
+
+            /** It's the tail of the list **/
+            if (current->next == NULL)
+            {
+                list->tail = current->prev;
+            }
+            else
+            {
+                current->next->prev = current->prev;
+            }
+
+            kfree(current);
+        }
+
+        current = current->next;
+    }
+}

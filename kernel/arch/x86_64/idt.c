@@ -1,5 +1,6 @@
 #include "levi/arch/x86_64/idt.h"
 
+#include <levi/arch/x86_64/apic.h>
 #include <levi/arch/x86_64/cpuregs.h>
 #include <levi/arch/x86_64/gdt.h>
 #include <levi/arch/x86_64/tss.h>
@@ -104,10 +105,12 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
     die();
 }
 
+#include <levi/utils/kprintf.h>
+
 void __isr_c_handler(struct isr_context *ctx)
 {
     // Saving the context
-
+    kprintf("ISR %ld rflags %lx\n", ctx->index, ctx->rflags);
     /** Get the process that was running **/
     proc_t *proc = proc_get(sched_get());
 
@@ -125,10 +128,20 @@ void __isr_c_handler(struct isr_context *ctx)
     /** Get the new process to run **/
     proc = proc_get(sched_get());
 
+    if (proc == NULL)
+    {
+        die();
+    }
+
     /** restore the process vas **/
     switch_vas(&proc->vas);
 
     memcpy(ctx, &proc->ctx.isr_ctx, sizeof(struct isr_context));
+
+    if (ctx->index == INTERRUPTS_TIMER_OFFSET)
+    {
+        lapic_eoi();
+    }
 }
 
 extern void isr_0(void);
@@ -441,7 +454,8 @@ void idt_init()
     set_entry(45, (u64)isr_45, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(46, (u64)isr_46, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(47, (u64)isr_47, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
-    set_entry(48, (u64)isr_48, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
+    set_entry(48, (u64)isr_48, SEGMENT_SELECTOR(1, 0, 0), 0,
+              INTERRUPT_GATE | ALLOW_TO_USER);
     set_entry(49, (u64)isr_49, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(50, (u64)isr_50, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(51, (u64)isr_51, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);

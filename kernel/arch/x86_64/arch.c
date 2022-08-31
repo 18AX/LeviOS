@@ -62,7 +62,7 @@ void arch_ctx_init(context_t *ctx, void *entry, void *stack, u8 is_kernel)
     ctx->isr_ctx.rsp = (u64)stack;
     ctx->isr_ctx.regs.rbp = (u64)stack;
 
-    if (is_kernel)
+    if (is_kernel == 1)
     {
         ctx->isr_ctx.cs = SEGMENT_SELECTOR(1, 0, 0);
         ctx->isr_ctx.ss = SEGMENT_SELECTOR(2, 0, 0);
@@ -80,4 +80,9 @@ extern void __ctx_set(struct isr_context *isr_ctx);
 void arch_ctx_set(context_t *ctx)
 {
     __ctx_set(&ctx->isr_ctx);
+}
+
+void arch_set_timer(u64 ms)
+{
+    lapic_timer_set((u32)ms);
 }

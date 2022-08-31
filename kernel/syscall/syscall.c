@@ -22,6 +22,8 @@ static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
     [SYSCALL_MMAP] = sys_mmap
 };
 
+#include <levi/utils/kprintf.h>
+
 u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
             u64 args3)
 {
@@ -29,6 +31,8 @@ u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
     {
         return SYSCALL_FAILED;
     }
+
+    kprintf("SYSCALL %d\n", syscall_id);
 
     return syscall_handlers[syscall_id](proc, args0, args1, args2, args3);
 }

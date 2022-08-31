@@ -72,4 +72,6 @@ void arch_ctx_init(context_t *ctx, void *entry, void *stack, u8 is_kernel);
 
 void arch_ctx_set(context_t *ctx);
 
+void arch_set_timer(u64 ms);
+
 #endif

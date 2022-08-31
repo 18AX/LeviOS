@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    printf("^rHello ^bFrom ^mUserland!");
+    printf("^rHello ^bFrom ^mUserland!\n");
 
     for (;;)
     {

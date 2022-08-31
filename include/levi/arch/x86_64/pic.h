@@ -6,8 +6,8 @@
 #define PIC_SLAVE_A 0xA0
 #define PIC_SLAVE_B 0xA1
 
-#define PIC_MASTER_OFFSET 0x30
-#define PIC_SLAVE_OFFSET 0x38
+#define PIC_MASTER_OFFSET 0x60
+#define PIC_SLAVE_OFFSET 0x68
 
 #define PIC_EOI 0x20
 

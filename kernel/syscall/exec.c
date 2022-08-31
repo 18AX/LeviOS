@@ -116,7 +116,7 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
                   (void *)(USER_STACK_ADDRESS + PAGE_SIZE * USER_STACK_PAGE_NB),
                   0);
 
-    sched_set(n_proc->id);
+    sched_add(n_proc->id);
     kclose(fd);
 
     return n_proc->id;
@@ -135,20 +135,5 @@ u64 kexec(const char *path, const char *proc_name, const char *argv[],
         return FAILED;
     }
 
-    proc_t *n_proc = proc_get(id);
-
-    if (n_proc == NULL)
-    {
-        return FAILED;
-    }
-
-    switch_vas(&n_proc->vas);
-    arch_ctx_set(&n_proc->ctx);
-
     return SUCCESS;
 }
-
-s64 exec(const char *path, const char *name, const char *argv[],
-         const char *envp[]);
-
-s64 exit(s64 exit_status);

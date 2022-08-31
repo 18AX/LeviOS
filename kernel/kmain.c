@@ -20,6 +20,8 @@
 
 static STATUS early_init(struct stivale2_struct *boot_info)
 {
+    interrupts_disable();
+
     interrupt_init();
 
     if (arch_init(boot_info) == FAILED)
@@ -49,7 +51,8 @@ static STATUS early_init(struct stivale2_struct *boot_info)
         return FAILED;
     }
 
-    sched_set(kernel_proc->id);
+    sched_init();
+    sched_add(kernel_proc->id);
 
     return SUCCESS;
 }
@@ -121,9 +124,6 @@ void main(struct stivale2_struct *boot_info)
 
     kprintf("[^cinfo^w] Kernel initialized\n");
 
-    interrupts_enable();
-    lapic_timer_set(100);
-
     u32 module_loaded = module_init(boot_info);
 
     kprintf("[^cinfo^w] %u modules loaded\n", module_loaded);
@@ -132,10 +132,21 @@ void main(struct stivale2_struct *boot_info)
 
     kprintf("[^cinfo^w] Start memfs:init\n");
 
+#if 1
     if (run_init(boot_info) == FAILED)
     {
         kerr(KERROR_UNKNOW, "Failed to run init\n");
     }
+#endif
+
+    kprintf("Run init\n");
+
+    interrupts_enable();
+
+    sched_start();
+
+    for (;;)
+        ;
 
     asm volatile("xchgw %bx, %bx");
 

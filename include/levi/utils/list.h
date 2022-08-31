@@ -27,6 +27,8 @@ void list_for_each(struct list *list, u32 (*func)(u32, void *));
 
 void list_for_each_rev(struct list *list, u32 (*func)(u32, void *));
 
+void list_remove_all(struct list *list, void *element);
+
 void list_destroy(struct list *list, void (*free_func)(void *));
 
 #endif

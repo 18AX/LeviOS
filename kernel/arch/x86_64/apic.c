@@ -113,6 +113,7 @@ STATUS apic_init()
     lapic_write(LAPIC_LVT_LINT0, LAPIC_LVT_DISABLE);
     lapic_write(LAPIC_LVT_LINT1, LAPIC_LVT_DISABLE);
     lapic_write(LAPIC_LVT_PMC, LAPIC_LVT_NMI);
+    lapic_write(LAPIC_TASK_PRIORITY, 0x0);
 
     ioapic_max_redirections = (ioapic_read(0x1) >> 16) & 0xFF;
 
@@ -135,7 +136,8 @@ void apic_enable()
 
     /** Bit 8 of the spurious interrupt vector can enable/disable apic **/
     u64 spurious_reg_value = lapic_read(LAPIC_SPURIOUS_INTERRUPT_VECTOR);
-    spurious_reg_value |= SPURIOUS_VECTOR_APIC_ENABLE;
+    spurious_reg_value |=
+        SPURIOUS_VECTOR_APIC_ENABLE | SPURIOUS_VECTOR_NO_EOI_BROADCAST | 0xFF;
     lapic_write(LAPIC_SPURIOUS_INTERRUPT_VECTOR, spurious_reg_value);
 }
 
@@ -227,7 +229,7 @@ STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
 
 void lapic_eoi(void)
 {
-    lapic_ptr[LAPIC_EOI] = 0x0;
+    lapic_write(LAPIC_EOI, 0x0);
 }
 
 STATUS lapic_timer_init(void)
@@ -247,9 +249,6 @@ STATUS lapic_timer_init(void)
     lapic_timer_ticks = 0xFFFFFFFF - lapic_read(LAPIC_TIMER_CURRENT_COUNT);
 
     lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0x0);
-
-    ioapic_irq_set(0, 0, INTERRUPTS_TIMER_OFFSET,
-                   IOAPIC_TRIGGER_HIGH | IOAPIC_TRIGGER_EDGE);
 
     lapic_write(LAPIC_LVT_TIMER,
                 LAPIC_LVT_TIMER_ONESHOT
