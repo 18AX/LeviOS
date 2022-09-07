@@ -36,4 +36,6 @@ u32 framebuffer_pixel_color(struct framebuffer_color color);
 
 void framebuffer_reset(void);
 
+void framebuffer_scroll_up(u32 n);
+
 #endif

@@ -33,6 +33,8 @@ struct vfs_operation
     s32 (*flush)(file_t *file);
     s64 (*lseek)(file_t *file, u64 offset, u32 whence);
 
+    s64 (*fdfunc)(file_t *file, u64 func_id, u64 args0, u64 args1, u64 args2);
+
     void (*destroy_file)(file_t *file);
 };
 

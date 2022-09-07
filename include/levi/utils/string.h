@@ -7,6 +7,8 @@ void *memcpy(void *dest, const void *src, u64 n);
 
 void *memset(void *dest, int val, u64 len);
 
+void *memmove(void *dest, const void *src, u64 n);
+
 u64 strlen(const char *str);
 
 u64 strnlen(const char *s, u64 maxlen);

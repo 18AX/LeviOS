@@ -24,6 +24,9 @@ s32 dup2(s32 oldfd, s32 newfd, proc_t *process);
 
 s32 kopen(const char *pathname, u32 flags);
 
+s64 fdfunc(s32 fd, u64 func_id, u64 args0, u64 args1, u64 args2,
+           proc_t *process);
+
 STATUS kclose(s32 fd);
 
 s64 kwrite(u32 fd, void *buffer, u64 size);
@@ -35,5 +38,7 @@ s32 kflush(u32 fd);
 s64 klseek(s32 fd, u64 offset, u32 whence);
 
 s32 kdup2(s32 oldfd, s32 newfd);
+
+s64 kfdfunc(s32 fd, u64 func_id, u64 args0, u64 args1, u64 args2);
 
 #endif

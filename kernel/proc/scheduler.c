@@ -9,12 +9,14 @@ static list_t *processes = NULL;
 
 #include <levi/utils/kprintf.h>
 
+static u64 i = 0;
+
 static void timer_handler(u64 id, u64 error_code, proc_t *proc)
 {
     (void)id;
     (void)error_code;
     (void)proc;
-    kprintf("SCHEDULER HANDLER\n");
+    kprintf("SCHEDULER HANDLER %lu\n", i++);
 
     if (current != NULL)
     {

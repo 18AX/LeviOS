@@ -18,7 +18,8 @@ static struct vfs_operation serial_operation = { .mkdir = NULL,
                                                  .destroy_file = __destroy_file,
                                                  .flush = NULL,
                                                  .read = NULL,
-                                                 .lseek = NULL };
+                                                 .lseek = NULL,
+                                                 .fdfunc = NULL };
 
 static vfs serial_vfs = { .name = "serial",
                           .flags = 0x0,

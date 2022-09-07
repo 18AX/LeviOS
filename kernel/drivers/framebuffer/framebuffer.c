@@ -19,7 +19,8 @@ static struct vfs_operation framebuffer_operation = { .mkdir = NULL,
                                                           __destroy_file,
                                                       .flush = __flush,
                                                       .read = __read,
-                                                      .lseek = __lseek };
+                                                      .lseek = __lseek,
+                                                      .fdfunc = NULL };
 
 static vfs framebuffer_vfs = { .name = "framebuffer",
                                .flags = 0x0,
@@ -100,6 +101,23 @@ u32 framebuffer_pixel_offset(u32 x, u32 y)
 void framebuffer_reset(void)
 {
     memset(video_buffer, 0x0, buffer_size);
+}
+
+void framebuffer_scroll_up(u32 n)
+{
+    u64 offset = framebuffer_pixel_offset(0, n);
+    u64 size = framebuffer_pixel_offset(framebuffer_info.framebuffer_width,
+                                        framebuffer_info.framebuffer_height);
+
+    for (u64 i = offset; i < size; ++i)
+    {
+        video_buffer[i - offset] = video_buffer[i];
+    }
+
+    u8 *o = ((u8 *)video_buffer)
+        + framebuffer_pixel_offset(0, framebuffer_info.framebuffer_height - n);
+
+    memset(o, 0, framebuffer_pixel_offset(0, n));
 }
 
 static file_t *__open(const char *name, u32 flags)

@@ -30,7 +30,8 @@ static struct vfs_operation console_operation = { .mkdir = NULL,
                                                       __destroy_file,
                                                   .flush = __flush,
                                                   .read = NULL,
-                                                  .lseek = NULL };
+                                                  .lseek = NULL,
+                                                  .fdfunc = NULL };
 
 static vfs console_vfs = { .name = "console",
                            .flags = 0x0,
@@ -78,22 +79,22 @@ static file_t *__open(const char *name, u32 flags)
     return f;
 }
 
+static void increment_y(void)
+{
+    y += LINE_HEIGH;
+}
+
 static void increment_x(void)
 {
     if (x + CHAR_WIDTH >= framebuffer_info.width)
     {
         x = 0;
-        y += LINE_HEIGH;
+        increment_y();
     }
     else
     {
         x += CHAR_WIDTH;
     }
-}
-
-static void increment_y(void)
-{
-    y += LINE_HEIGH;
 }
 
 static void __destroy_file(file_t *file)
@@ -103,6 +104,12 @@ static void __destroy_file(file_t *file)
 
 static u32 handle_char(char c, u32 color)
 {
+    if (y >= framebuffer_info.height)
+    {
+        framebuffer_scroll_up(LINE_HEIGH);
+        y -= LINE_HEIGH;
+        x = 0;
+    }
     switch (c)
     {
     case '\n':
@@ -226,7 +233,7 @@ static void put_pixel(u32 x, u32 y, u32 pixel_color)
 }
 
 static u8 font[128][8] = {
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // U+0000 (nul)
+    { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, // U+0000 (nul)
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // U+0001
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // U+0002
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // U+0003

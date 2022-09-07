@@ -153,6 +153,25 @@ s32 dup2(s32 oldfd, s32 newfd, proc_t *process)
     return newfd;
 }
 
+s64 fdfunc(s32 fd, u64 func_id, u64 args0, u64 args1, u64 args2,
+           proc_t *process)
+{
+    if (fd < 0 || fd >= FD_TABLE_LEN || process->fds[fd] == NULL)
+    {
+        return -1;
+    }
+
+    file_t *f = process->fds[fd];
+
+    if (f->vfs == NULL || f->vfs->operation == NULL
+        || f->vfs->operation->lseek == NULL)
+    {
+        return -1;
+    }
+
+    return f->vfs->operation->fdfunc(f, func_id, args0, args1, args2);
+}
+
 s32 kopen(const char *pathname, u32 flags)
 {
     proc_t *kern_proc = proc_get(0);
@@ -200,4 +219,11 @@ s32 kdup2(s32 oldfd, s32 newfd)
     proc_t *kern_proc = proc_get(0);
 
     return dup2(oldfd, newfd, kern_proc);
+}
+
+s64 kfdfunc(s32 fd, u64 func_id, u64 args0, u64 args1, u64 args2)
+{
+    proc_t *kern_proc = proc_get(0);
+
+    return fdfunc(fd, func_id, args0, args1, args2, kern_proc);
 }
