@@ -105,12 +105,8 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
     die();
 }
 
-#include <levi/utils/kprintf.h>
-
 void __isr_c_handler(struct isr_context *ctx)
 {
-    // Saving the context
-    kprintf("ISR %ld rflags %lx\n", ctx->index, ctx->rflags);
     /** Get the process that was running **/
     proc_t *proc = proc_get(sched_get());
 
@@ -138,10 +134,7 @@ void __isr_c_handler(struct isr_context *ctx)
 
     memcpy(ctx, &proc->ctx.isr_ctx, sizeof(struct isr_context));
 
-    if (ctx->index == INTERRUPTS_TIMER_OFFSET)
-    {
-        lapic_eoi();
-    }
+    lapic_eoi();
 }
 
 extern void isr_0(void);

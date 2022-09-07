@@ -103,8 +103,6 @@ static STATUS init(struct stivale2_struct *boot_info)
     return SUCCESS;
 }
 
-#include <levi/arch/x86_64/apic.h>
-
 void main(struct stivale2_struct *boot_info)
 {
     if (early_init(boot_info) == FAILED)
@@ -132,14 +130,10 @@ void main(struct stivale2_struct *boot_info)
 
     kprintf("[^cinfo^w] Start memfs:init\n");
 
-#if 1
     if (run_init(boot_info) == FAILED)
     {
         kerr(KERROR_UNKNOW, "Failed to run init\n");
     }
-#endif
-
-    kprintf("Run init\n");
 
     interrupts_enable();
 
