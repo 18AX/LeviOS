@@ -121,6 +121,8 @@ void __isr_c_handler(struct isr_context *ctx)
     /** throw the interrupts **/
     throw_interrupts(ctx->index, ctx->error_code, proc);
 
+    sched_schedule();
+
     /** Get the new process to run **/
     proc = proc_get(sched_get());
 

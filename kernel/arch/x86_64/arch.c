@@ -83,11 +83,6 @@ void arch_ctx_set(context_t *ctx)
     __ctx_set(&ctx->isr_ctx);
 }
 
-void arch_set_timer(u64 ms)
-{
-    lapic_timer_set((u32)ms);
-}
-
 void arch_get_time(struct time *time)
 {
     cmos_get_time(time);

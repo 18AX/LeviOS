@@ -14,4 +14,8 @@ struct time
     u32 year;
 };
 
+u64 timer_init(void);
+
+u64 timer_count(void);
+
 #endif

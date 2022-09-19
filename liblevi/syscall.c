@@ -149,3 +149,8 @@ void gettime(struct time *time)
 {
     sys_exec(SYSCALL_GETTIME, (u64)time, 0x0, 0X0, 0x0);
 }
+
+u64 getticks()
+{
+    return sys_exec(SYSCALL_GETTICKS, 0x0, 0x0, 0x0, 0x0);
+}

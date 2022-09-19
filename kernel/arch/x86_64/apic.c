@@ -251,13 +251,10 @@ STATUS lapic_timer_init(void)
     lapic_write(LAPIC_TIMER_INITIAL_COUNT, 0x0);
 
     lapic_write(LAPIC_LVT_TIMER,
-                LAPIC_LVT_TIMER_ONESHOT
+                LAPIC_LVT_TIMER_PERIODIC
                     | LAPIC_LVT_VECTOR(INTERRUPTS_TIMER_OFFSET));
 
-    return SUCCESS;
-}
+    lapic_write(LAPIC_TIMER_INITIAL_COUNT, lapic_timer_ticks);
 
-void lapic_timer_set(u32 ms)
-{
-    lapic_write(LAPIC_TIMER_INITIAL_COUNT, ms * lapic_timer_ticks);
+    return SUCCESS;
 }

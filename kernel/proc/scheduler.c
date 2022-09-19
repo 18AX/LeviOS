@@ -1,17 +1,22 @@
 #include <levi/arch.h>
 #include <levi/interrupts/interrupts.h>
 #include <levi/proc/scheduler.h>
+#include <levi/time/time.h>
 #include <levi/utils/list.h>
 
 static struct list_element *current = NULL;
 
 static list_t *processes = NULL;
+static u64 to_count = 0;
 
-static void timer_handler(u64 id, u64 error_code, proc_t *proc)
+void sched_schedule()
 {
-    (void)id;
-    (void)error_code;
-    (void)proc;
+    u64 count = timer_count();
+
+    if (count < to_count)
+    {
+        return;
+    }
 
     if (current != NULL)
     {
@@ -21,7 +26,7 @@ static void timer_handler(u64 id, u64 error_code, proc_t *proc)
         }
     }
 
-    arch_set_timer(200);
+    to_count = count + 200;
 }
 
 STATUS sched_init()
@@ -32,8 +37,6 @@ STATUS sched_init()
     {
         return FAILED;
     }
-
-    register_interrupt_handler(INTERRUPTS_TIMER_OFFSET, timer_handler);
 
     return SUCCESS;
 }
@@ -62,9 +65,4 @@ u64 sched_get(void)
     }
 
     return (u64)current->data;
-}
-
-void sched_start()
-{
-    arch_set_timer(200);
 }

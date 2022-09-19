@@ -46,7 +46,7 @@
 #define LAPIC_LVT_DELIVERY_PENDING (1 << 12)
 
 #define LAPIC_LVT_TIMER_ONESHOT 0x0
-#define LAPIC_LVT_TIMER_PERIODIC 0x1
+#define LAPIC_LVT_TIMER_PERIODIC (1 << 17)
 
 struct apic_redirection
 {

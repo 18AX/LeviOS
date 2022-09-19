@@ -14,6 +14,7 @@
 #include <levi/proc/process.h>
 #include <levi/proc/scheduler.h>
 #include <levi/stivale2.h>
+#include <levi/time/time.h>
 #include <levi/types.h>
 #include <levi/utils/kerr.h>
 #include <levi/utils/kprintf.h>
@@ -50,6 +51,8 @@ static STATUS early_init(struct stivale2_struct *boot_info)
     {
         return FAILED;
     }
+
+    timer_init();
 
     sched_init();
     sched_add(kernel_proc->id);
@@ -136,8 +139,6 @@ void main(struct stivale2_struct *boot_info)
     }
 
     interrupts_enable();
-
-    sched_start();
 
     for (;;)
         ;

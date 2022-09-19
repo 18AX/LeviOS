@@ -43,7 +43,9 @@ KERNEL_OBJ= kmain.c.o \
 	syscall/dup2.c.o \
 	syscall/mmap.c.o \
 	syscall/gettime.c.o \
+	syscall/getticks.c.o \
 	modules/module.c.o \
+	time/time.c.o \
 	init.c.o \
 
 

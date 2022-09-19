@@ -16,6 +16,7 @@
 #define SYSCALL_MMAP 9
 #define SYSCALL_MUNMAP 10
 #define SYSCALL_GETTIME 11
+#define SYSCALL_GETTICKS 12
 
 #define FS_READ 0x0
 #define FS_WRITE 0x1
@@ -50,5 +51,7 @@ s64 exit(s64 exit_status);
 void *mmap(void *address, u64 nb_page, u64 flags);
 
 void gettime(struct time *time);
+
+u64 getticks(void);
 
 #endif

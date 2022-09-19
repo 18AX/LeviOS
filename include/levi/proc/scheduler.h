@@ -17,6 +17,6 @@ void sched_remove(u64 id);
  */
 u64 sched_get(void);
 
-void sched_start(void);
+void sched_schedule(void);
 
 #endif
