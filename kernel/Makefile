@@ -29,6 +29,7 @@ KERNEL_OBJ= kmain.c.o \
 	drivers/serial/serial.c.o \
 	drivers/framebuffer/framebuffer.c.o \
 	drivers/console/console.c.o \
+	drivers/fs/iso9660.c.o \
 	devices/kbd.c.o \
 	devices/kbd/intel8042.c.o \
 	syscall/syscall.c.o \

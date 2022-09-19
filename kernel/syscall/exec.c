@@ -39,14 +39,25 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
 
     /** TODO: Check elf magic header **/
 
-    klseek(fd, header.e_phoff, FS_SEEK_SET);
+    if (klseek(fd, header.e_phoff, FS_SEEK_SET) < 0)
+    {
+        proc_destroy(n_proc);
+        kclose(fd);
+    }
 
     u64 max_addr = 0x0;
 
     for (u32 i = 0; i < header.e_phnum; ++i)
     {
         /** Move the cursor to the next program header **/
-        klseek(fd, header.e_phoff + sizeof(ElfW(Phdr)) * i, FS_SEEK_SET);
+        if (klseek(fd, header.e_phoff + sizeof(ElfW(Phdr)) * i, FS_SEEK_SET)
+            < 0)
+        {
+            proc_destroy(n_proc);
+            kclose(fd);
+
+            return SYSCALL_FAILED;
+        }
 
         ElfW(Phdr) phdr;
 
@@ -94,7 +105,14 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
         }
 
         /** Copy segment to destination **/
-        klseek(fd, phdr.p_offset, FS_SEEK_SET);
+        if (klseek(fd, phdr.p_offset, FS_SEEK_SET) < 0)
+        {
+            proc_destroy(n_proc);
+            kclose(fd);
+
+            return SYSCALL_FAILED;
+        }
+
         kread(fd, (void *)addr, phdr.p_filesz);
 
         if ((phdr.p_vaddr + phdr.p_memsz) > max_addr)

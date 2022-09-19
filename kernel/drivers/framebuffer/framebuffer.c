@@ -3,7 +3,7 @@
 #include <levi/memory/memory.h>
 #include <levi/utils/string.h>
 
-static file_t *__open(const char *name, u32 flags);
+static file_t *__open(vfs *vfs, const char *name, u32 flags);
 static void __destroy_file(file_t *file);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
 static s64 __read(file_t *file, u8 *buffer, u64 size);
@@ -24,6 +24,7 @@ static struct vfs_operation framebuffer_operation = { .mkdir = NULL,
 
 static vfs framebuffer_vfs = { .name = "framebuffer",
                                .flags = 0x0,
+                               .data = NULL,
                                .operation = &framebuffer_operation };
 
 static struct stivale2_struct_tag_framebuffer framebuffer_info = { 0 };
@@ -120,8 +121,9 @@ void framebuffer_scroll_up(u32 n)
     memset(o, 0, framebuffer_pixel_offset(0, n));
 }
 
-static file_t *__open(const char *name, u32 flags)
+static file_t *__open(vfs *vfs, const char *name, u32 flags)
 {
+    (void)vfs;
     (void)name; // We dont care about the name;
     (void)flags;
 

@@ -226,41 +226,10 @@ MAP_STATUS vascpy(vas_t *dst, vas_t *src)
     return MAP_SUCCESS;
 }
 
-static void destroy_vas_rec(struct pml_entry *entry, u32 layer)
-{
-    if (layer >= 4)
-    {
-        return;
-    }
-
-    for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
-    {
-        destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
-                            (u64)LSHIFT(entry[i].page_table_addr, 12))),
-                        layer + 1);
-    }
-
-    kframe_free(entry, 1);
-}
+#include <levi/utils/kerr.h>
 
 void destroy_vas(vas_t *vas)
 {
-    struct pml_entry *pml = vas->data;
-
-    for (u64 i = 0; i < PAGE_SIZE / sizeof(struct pml_entry); ++i)
-    {
-        /** We skip kernel memory mapping **/
-        if (i == 0x1FF)
-        {
-            continue;
-        }
-
-        destroy_vas_rec((struct pml_entry *)(phys_to_hhdm(
-                            (u64)LSHIFT(pml[i].page_table_addr, 12))),
-                        1);
-    }
-
-    kframe_free(pml, 1);
-
-    kfree(vas);
+    (void)vas;
+    kerr(0x0, "destory_vas not implemented yet\n");
 }

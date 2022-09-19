@@ -4,7 +4,7 @@
 #include <levi/utils/string.h>
 #include <levi/utils/stringmap.h>
 
-static file_t *__open(const char *name, u32 flags);
+static file_t *__open(vfs *vfs, const char *name, u32 flags);
 static void __destroy_file(file_t *file);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
 static s64 __read(file_t *file, u8 *buffer, u64 size);
@@ -91,8 +91,9 @@ STATUS memfile_destroy(const char *name)
     return SUCCESS;
 }
 
-static file_t *__open(const char *name, u32 flags)
+static file_t *__open(vfs *vfs, const char *name, u32 flags)
 {
+    (void)vfs;
     (void)flags; // TODO: check perms
     memfile_t *memfile = NULL;
 

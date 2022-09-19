@@ -5,7 +5,7 @@
 #include "levi/memory/memory.h"
 #include "levi/utils/string.h"
 
-static file_t *__open(const char *name, u32 flags);
+static file_t *__open(vfs *vfs, const char *name, u32 flags);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
 static void __destroy_file(file_t *file);
 
@@ -23,6 +23,7 @@ static struct vfs_operation serial_operation = { .mkdir = NULL,
 
 static vfs serial_vfs = { .name = "serial",
                           .flags = 0x0,
+                          .data = NULL,
                           .operation = &serial_operation };
 
 STATUS serial_init()
@@ -30,8 +31,10 @@ STATUS serial_init()
     return register_fs(&serial_vfs);
 }
 
-static file_t *__open(const char *name, u32 flags)
+static file_t *__open(vfs *vfs, const char *name, u32 flags)
 {
+    (void)vfs;
+
     if ((flags & FS_WRITE) == 0)
     {
         return NULL;

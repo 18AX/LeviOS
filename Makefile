@@ -19,3 +19,4 @@ clean:
 	$(MAKE) -C liblevi clean
 	$(MAKE) -C init clean
 	$(RM) levi.iso
+	$(RM) -rf isofiles

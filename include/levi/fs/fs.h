@@ -21,6 +21,17 @@ typedef struct file
     void *data;
 } file_t;
 
+struct vfs_operation;
+
+typedef struct vfs
+{
+    char *name; // Use as map key;
+    u32 flags;
+    void *data;
+
+    struct vfs_operation *operation;
+} vfs;
+
 struct vfs_operation
 {
     struct node *(*mkdir)(const char *name, const char *path, u32 flags);
@@ -29,7 +40,7 @@ struct vfs_operation
 
     s64 (*read)(file_t *file, u8 *buffer, u64 size);
     s64 (*write)(file_t *file, u8 *buffer, u64 size);
-    file_t *(*open)(const char *name, u32 flags);
+    file_t *(*open)(vfs *vfs, const char *name, u32 flags);
     s32 (*flush)(file_t *file);
     s64 (*lseek)(file_t *file, u64 offset, u32 whence);
 
@@ -37,14 +48,6 @@ struct vfs_operation
 
     void (*destroy_file)(file_t *file);
 };
-
-typedef struct vfs
-{
-    char *name; // Use as map key;
-    u32 flags;
-
-    struct vfs_operation *operation;
-} vfs;
 
 STATUS init_fs(void);
 

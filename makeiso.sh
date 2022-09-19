@@ -1,14 +1,21 @@
-mkdir -p isofiles/boot
-mkdir -p isofiles/initc
-
+# Delete old iso
 rm -f levi.iso
+
+mkdir -p isofiles/boot
 
 cp limine/limine-cd.bin isofiles/boot/
 cp limine/limine-eltorito-efi.bin isofiles/boot/
 cp limine/limine.sys isofiles/boot/
 cp limine.cfg isofiles/boot/
-cp kernel/build/levi isofiles/boot/
-cp init/init.elf isofiles/init/init.elf
+
+# Copy the kernel
+cp kernel/build/levi isofiles/
+
+# Copy all files that will be in the initfs iso
+cp init/init.elf initfs/init.elf
+
+# Make the initfs iso
+xorriso -as mkisofs initfs -o isofiles/initfs.iso
 
 xorriso -as mkisofs -b boot/limine-cd.bin \
         -no-emul-boot -boot-load-size 4 -boot-info-table \

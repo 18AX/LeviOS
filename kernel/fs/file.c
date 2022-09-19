@@ -131,6 +131,19 @@ s64 lseek(s32 fd, u64 offset, u32 whence, proc_t *process)
     return f->vfs->operation->lseek(f, offset, whence);
 }
 
+s32 dup(s32 oldfd, proc_t *process)
+{
+    for (u32 i = 0; i < FD_TABLE_LEN; ++i)
+    {
+        if (process->fds[i] == NULL)
+        {
+            return dup2(oldfd, i, process);
+        }
+    }
+
+    return -1;
+}
+
 s32 dup2(s32 oldfd, s32 newfd, proc_t *process)
 {
     if (oldfd < 0 || oldfd >= FD_TABLE_LEN || newfd < 0 || newfd >= FD_TABLE_LEN
@@ -219,6 +232,13 @@ s32 kdup2(s32 oldfd, s32 newfd)
     proc_t *kern_proc = proc_get(0);
 
     return dup2(oldfd, newfd, kern_proc);
+}
+
+s32 kdup(s32 oldfd)
+{
+    proc_t *kern_proc = proc_get(0);
+
+    return dup(oldfd, kern_proc);
 }
 
 s64 kfdfunc(s32 fd, u64 func_id, u64 args0, u64 args1, u64 args2)

@@ -241,3 +241,16 @@ s32 charindex(const char *str, char c)
 
     return -1;
 }
+
+char *strtoupper(char *str)
+{
+    for (u64 i = 0; str[i] != '\0'; ++i)
+    {
+        if (str[i] >= 'a' && str[i] <= 'z')
+        {
+            str[i] = str[i] - 'a' + 'A';
+        }
+    }
+
+    return str;
+}

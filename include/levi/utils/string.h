@@ -31,4 +31,6 @@ char *strchr(char *str, char c);
 
 s32 charindex(const char *str, char c);
 
+char *strtoupper(char *str);
+
 #endif

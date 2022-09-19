@@ -9,7 +9,7 @@
 #define LINE_HEIGH 15
 #define CHAR_WIDTH 10
 
-static file_t *__open(const char *name, u32 flags);
+static file_t *__open(vfs *vfs, const char *name, u32 flags);
 static void __destroy_file(file_t *file);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
 static s32 __flush(file_t *file);
@@ -35,6 +35,7 @@ static struct vfs_operation console_operation = { .mkdir = NULL,
 
 static vfs console_vfs = { .name = "console",
                            .flags = 0x0,
+                           .data = NULL,
                            .operation = &console_operation };
 
 static struct framebuffer_info framebuffer_info = { 0 };
@@ -62,8 +63,9 @@ STATUS console_init(void)
     return register_fs(&console_vfs);
 }
 
-static file_t *__open(const char *name, u32 flags)
+static file_t *__open(vfs *vfs, const char *name, u32 flags)
 {
+    (void)vfs;
     (void)name;
     (void)flags;
 

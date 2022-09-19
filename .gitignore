@@ -1,5 +1,6 @@
 limine
 kernel/build
 isofiles
+initfs
 *.iso
 *.log

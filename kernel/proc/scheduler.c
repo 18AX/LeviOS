@@ -16,7 +16,7 @@ static void timer_handler(u64 id, u64 error_code, proc_t *proc)
     (void)id;
     (void)error_code;
     (void)proc;
-    kprintf("SCHEDULER HANDLER %lu\n", i++);
+    kprintf("SCHEDULER HANDLER %lu %p\n", i++, current);
 
     if (current != NULL)
     {

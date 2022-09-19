@@ -73,7 +73,7 @@ file_t *open_file(const char *path, u32 flags)
         return NULL;
     }
 
-    file_t *file = vfs->operation->open(value, flags);
+    file_t *file = vfs->operation->open(vfs, value, flags);
 
     if (file == NULL)
     {
