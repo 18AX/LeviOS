@@ -42,6 +42,7 @@ KERNEL_OBJ= kmain.c.o \
 	syscall/exit.c.o \
 	syscall/dup2.c.o \
 	syscall/mmap.c.o \
+	syscall/gettime.c.o \
 	modules/module.c.o \
 	init.c.o \
 
@@ -64,6 +65,7 @@ x86_64_OBJ= $(KERNEL_OBJ) \
 	arch/x86_64/syscall64.c.o \
 	arch/x86_64/apic.c.o \
 	arch/x86_64/hpet.c.o \
+	arch/x86_64/cmos.c.o \
 
 x86_64: CFLAGS += -Dx86_64
 x86_64: $(addprefix $(BUILDDIR)/, $(x86_64_OBJ))

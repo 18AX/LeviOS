@@ -144,3 +144,8 @@ void *mmap(void *address, u64 nb_page, u64 flags)
 
     return (void *)ret;
 }
+
+void gettime(struct time *time)
+{
+    sys_exec(SYSCALL_GETTIME, (u64)time, 0x0, 0X0, 0x0);
+}

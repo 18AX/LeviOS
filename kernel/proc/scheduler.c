@@ -7,16 +7,11 @@ static struct list_element *current = NULL;
 
 static list_t *processes = NULL;
 
-#include <levi/utils/kprintf.h>
-
-static u64 i = 0;
-
 static void timer_handler(u64 id, u64 error_code, proc_t *proc)
 {
     (void)id;
     (void)error_code;
     (void)proc;
-    kprintf("SCHEDULER HANDLER %lu %p\n", i++, current);
 
     if (current != NULL)
     {

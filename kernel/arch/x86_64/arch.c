@@ -1,6 +1,7 @@
 #include <levi/arch.h>
 #include <levi/arch/x86_64/acpi.h>
 #include <levi/arch/x86_64/apic.h>
+#include <levi/arch/x86_64/cmos.h>
 #include <levi/arch/x86_64/gdt.h>
 #include <levi/arch/x86_64/hpet.h>
 #include <levi/arch/x86_64/idt.h>
@@ -85,4 +86,9 @@ void arch_ctx_set(context_t *ctx)
 void arch_set_timer(u64 ms)
 {
     lapic_timer_set((u32)ms);
+}
+
+void arch_get_time(struct time *time)
+{
+    cmos_get_time(time);
 }

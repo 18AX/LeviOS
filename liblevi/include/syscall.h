@@ -1,6 +1,7 @@
 #ifndef SYSCALL_HEADER
 #define SYSCALL_HEADER
 
+#include <time.h>
 #include <types.h>
 
 #define SYSCALL_OPEN 0
@@ -14,6 +15,7 @@
 #define SYSCALL_EXIT 8
 #define SYSCALL_MMAP 9
 #define SYSCALL_MUNMAP 10
+#define SYSCALL_GETTIME 11
 
 #define FS_READ 0x0
 #define FS_WRITE 0x1
@@ -46,5 +48,7 @@ s64 exec(const char *path, const char *name, const char *argv[],
 s64 exit(s64 exit_status);
 
 void *mmap(void *address, u64 nb_page, u64 flags);
+
+void gettime(struct time *time);
 
 #endif

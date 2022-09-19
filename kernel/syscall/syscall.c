@@ -5,6 +5,7 @@
 #include <levi/syscall/exec.h>
 #include <levi/syscall/exit.h>
 #include <levi/syscall/flush.h>
+#include <levi/syscall/gettime.h>
 #include <levi/syscall/mmap.h>
 #include <levi/syscall/open.h>
 #include <levi/syscall/read.h>
@@ -19,10 +20,8 @@ static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
     [SYSCALL_WRITE] = sys_write, [SYSCALL_FLUSH] = sys_flush,
     [SYSCALL_CLOSE] = sys_close, [SYSCALL_DUP2] = sys_dup2,
     [SYSCALL_EXEC] = sys_exec,   [SYSCALL_EXIT] = sys_exit,
-    [SYSCALL_MMAP] = sys_mmap
+    [SYSCALL_MMAP] = sys_mmap,   [SYSCALL_GETTIME] = sys_gettime
 };
-
-#include <levi/utils/kprintf.h>
 
 u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
             u64 args3)
@@ -31,8 +30,6 @@ u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
     {
         return SYSCALL_FAILED;
     }
-
-    kprintf("SYSCALL %d\n", syscall_id);
 
     return syscall_handlers[syscall_id](proc, args0, args1, args2, args3);
 }

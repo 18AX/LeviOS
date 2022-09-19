@@ -3,6 +3,7 @@
 
 #include <levi/arch/x86_64/tss.h>
 #include <levi/stivale2.h>
+#include <levi/time/time.h>
 #include <levi/types.h>
 
 // Struct registers to be define by the arch
@@ -73,5 +74,7 @@ void arch_ctx_init(context_t *ctx, void *entry, void *stack, u8 is_kernel);
 void arch_ctx_set(context_t *ctx);
 
 void arch_set_timer(u64 ms);
+
+void arch_get_time(struct time *time);
 
 #endif
