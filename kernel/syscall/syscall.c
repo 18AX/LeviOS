@@ -4,6 +4,7 @@
 #include <levi/syscall/dup2.h>
 #include <levi/syscall/exec.h>
 #include <levi/syscall/exit.h>
+#include <levi/syscall/fdfunc.h>
 #include <levi/syscall/flush.h>
 #include <levi/syscall/getticks.h>
 #include <levi/syscall/gettime.h>
@@ -17,12 +18,12 @@
 static u8 syscall_stack[SYSCALL_STACK_SIZE];
 
 static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
-    [SYSCALL_OPEN] = sys_open,        [SYSCALL_READ] = sys_read,
-    [SYSCALL_WRITE] = sys_write,      [SYSCALL_FLUSH] = sys_flush,
-    [SYSCALL_CLOSE] = sys_close,      [SYSCALL_DUP2] = sys_dup2,
-    [SYSCALL_EXEC] = sys_exec,        [SYSCALL_EXIT] = sys_exit,
-    [SYSCALL_MMAP] = sys_mmap,        [SYSCALL_GETTIME] = sys_gettime,
-    [SYSCALL_GETTICKS] = sys_getticks
+    [SYSCALL_OPEN] = sys_open,         [SYSCALL_READ] = sys_read,
+    [SYSCALL_WRITE] = sys_write,       [SYSCALL_FLUSH] = sys_flush,
+    [SYSCALL_CLOSE] = sys_close,       [SYSCALL_DUP2] = sys_dup2,
+    [SYSCALL_EXEC] = sys_exec,         [SYSCALL_EXIT] = sys_exit,
+    [SYSCALL_MMAP] = sys_mmap,         [SYSCALL_GETTIME] = sys_gettime,
+    [SYSCALL_GETTICKS] = sys_getticks, [SYSCALL_FDFUNC] = sys_fdfunc
 };
 
 u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,

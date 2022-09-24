@@ -8,7 +8,7 @@
 
 // Struct registers to be define by the arch
 
-#if 1
+#if x86_64
 #    define RFLAGS_CF (1)
 #    define RFLAGS_RESERVED1 (1 << 1)
 #    define RFLAGS_PF (1 << 2)

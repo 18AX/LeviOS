@@ -154,3 +154,8 @@ u64 getticks()
 {
     return sys_exec(SYSCALL_GETTICKS, 0x0, 0x0, 0x0, 0x0);
 }
+
+u64 fdfunc(s32 fd, u64 func_id, u64 args0, u64 args1)
+{
+    return sys_exec(SYSCALL_FDFUNC, fd, func_id, args0, args1);
+}

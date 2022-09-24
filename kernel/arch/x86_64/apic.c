@@ -57,6 +57,12 @@ STATUS apic_init()
 
     struct madt_record *record = NULL;
 
+    /** We init with 0xFF to make the difference between irq that are override
+     * or not **/
+    memset(interrupts_override, 0xFF,
+           sizeof(struct madt_ioapic_interrupt_override)
+               * IO_REDIRECTION_TABLE_SIZE);
+
     /** We are looking for the address of the io apic, the local apic, lapic
      * cpus and apic irq overrides. **/
     while ((record = (struct madt_record *)madt_records)->len != 0)
@@ -216,10 +222,15 @@ STATUS ioapic_irq_set(u8 cpuid, u8 apic_pin, u8 interrupts_vector, u32 flags)
         redirection.interrupt_mask = 1;
     }
 
-    /** x << 1 = x * 2 the structure needs to be written on two entries **/
-    u32 offset = (interrupts_override[apic_pin].global_system_interrupt
+    u32 offset = apic_pin << 1;
+
+    if (interrupts_override[apic_pin].irq_source != 0xFF)
+    {
+        /** x << 1 = x * 2 the structure needs to be written on two entries **/
+        offset = (interrupts_override[apic_pin].global_system_interrupt
                   - ioapic_global_interrupt_base)
-        << 1;
+            << 1;
+    }
 
     ioapic_write(IO_REDIRECTION_TABLE_BASE + offset, redirection.low);
     ioapic_write(IO_REDIRECTION_TABLE_BASE + offset + 1, redirection.high);

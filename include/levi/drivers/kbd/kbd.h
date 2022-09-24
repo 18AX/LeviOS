@@ -1,10 +1,7 @@
 #ifndef KBD_HEADER
 #define KBD_HEADER
 
-#define KEY_PRESS 1
-#define KEY_RELEASE 0
-
-#include "levi/types.h"
+#define FDFUNC_GETKEY 0x7ADF449E83A56016
 
 enum keycode
 {
@@ -43,15 +40,5 @@ enum keycode
     KEYCODE_ENTER,
     KEYCODE_UNKNOWN,
 };
-
-void kbd_init(void);
-
-void on_key_press(enum keycode key);
-
-void on_key_release(enum keycode key);
-
-u32 key_state(enum keycode key);
-
-u64 get_kbd_state();
 
 #endif

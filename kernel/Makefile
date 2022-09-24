@@ -15,6 +15,7 @@ KERNEL_OBJ= kmain.c.o \
 	utils/list.c.o \
 	utils/kprintf.c.o \
 	utils/kerr.c.o \
+	utils/queue.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \
@@ -30,8 +31,7 @@ KERNEL_OBJ= kmain.c.o \
 	drivers/framebuffer/framebuffer.c.o \
 	drivers/console/console.c.o \
 	drivers/fs/iso9660.c.o \
-	devices/kbd.c.o \
-	devices/kbd/intel8042.c.o \
+	drivers/kbd/intel8042.c.o \
 	syscall/syscall.c.o \
 	syscall/exec.c.o \
 	syscall/open.c.o \
@@ -44,6 +44,7 @@ KERNEL_OBJ= kmain.c.o \
 	syscall/mmap.c.o \
 	syscall/gettime.c.o \
 	syscall/getticks.c.o \
+	syscall/fdfunc.c.o \
 	modules/module.c.o \
 	time/time.c.o \
 	init.c.o \

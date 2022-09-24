@@ -1,5 +1,4 @@
 #include <levi/arch.h>
-#include <levi/devices/kbd.h>
 #include <levi/drivers/drivers.h>
 #include <levi/fs/file.h>
 #include <levi/fs/fs.h>
@@ -100,8 +99,6 @@ static STATUS init(struct stivale2_struct *boot_info)
     {
         return FAILED;
     }
-
-    kbd_init();
 
     return SUCCESS;
 }
