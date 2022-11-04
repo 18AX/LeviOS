@@ -27,7 +27,7 @@ int main(void)
     {
         u64 value = fdfunc(fd, 0x7ADF449E83A56016, 0, 0);
 
-        if (value < 26)
+        if (value < 1000)
         {
             printf("KEY %lu\n", value);
         }

@@ -19,6 +19,7 @@ KERNEL_OBJ= kmain.c.o \
 	memory/memory.c.o \
 	memory/page_alloc.c.o \
 	memory/kalloc.c.o \
+	memory/mem_pool.c.o \
 	interrupts/interrupts.c.o \
 	proc/process.c.o \
 	proc/scheduler.c.o \
