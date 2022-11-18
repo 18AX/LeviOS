@@ -12,6 +12,7 @@
 #include <levi/panic.h>
 #include <levi/proc/process.h>
 #include <levi/proc/scheduler.h>
+#include <levi/serial/serial.h>
 #include <levi/stivale2.h>
 #include <levi/time/time.h>
 #include <levi/types.h>
@@ -21,6 +22,10 @@
 static STATUS early_init(struct stivale2_struct *boot_info)
 {
     interrupts_disable();
+
+    serial_init_port(COM1);
+
+    serial_write(COM1, "Hello", 5);
 
     interrupt_init();
 

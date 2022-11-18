@@ -1,9 +1,9 @@
-#include "levi/drivers/serial/serial.h"
-
-#include "levi/arch/x86_64/io.h"
-#include "levi/fs/fs.h"
-#include "levi/memory/memory.h"
-#include "levi/utils/string.h"
+#include <levi/arch/x86_64/io.h>
+#include <levi/drivers/serial/serial.h>
+#include <levi/fs/fs.h>
+#include <levi/memory/memory.h>
+#include <levi/serial/serial.h>
+#include <levi/utils/string.h>
 
 static file_t *__open(vfs *vfs, const char *name, u32 flags);
 static s64 __write(file_t *file, u8 *buffer, u64 size);
@@ -42,16 +42,7 @@ static file_t *__open(vfs *vfs, const char *name, u32 flags)
 
     if (strcmp(name, "COM1") == 0)
     {
-        outb(COM1 + 3, 0x80); // Set DLAB to 1
-        outb(COM1 + 0, 0x00); // Divisor low byte for 38400 bps
-        outb(COM1 + 1, 0x03); // Divisor high byte for 38400 bps
-        outb(COM1 + 3, 0x03);
-
-        outb(COM1, 0x03); // 00000011: No parity and 8 bits
-        outb(COM1 + 2,
-             0xC7); // 11000111: interrupt trigger level 14 bytes, Clear
-                    // transmit fifo (bit 2), Clear Receive fifo (bit 1), enable
-                    // fifo (bit 0)
+        serial_init_port(COM1);
 
         file_t *file = kmalloc(sizeof(file_t));
 
@@ -70,21 +61,12 @@ static file_t *__open(vfs *vfs, const char *name, u32 flags)
 
 static s64 __write(file_t *file, u8 *buffer, u64 size)
 {
-    u64 w = 0;
-
-    u16 port = (u16)((u64)file->data);
-
-    for (; w < size; ++w)
+    if (file == NULL)
     {
-        // Waiting for the serial to be availabe for writing
-        while ((inb(port + 5) & (1 << 5)) == 0)
-            ;
-
-        // Write the data to the serial port
-        outb(port, buffer[w]);
+        return -1;
     }
 
-    return w;
+    return serial_write((u16)(u64)file->data, buffer, size);
 }
 
 static void __destroy_file(file_t *file)

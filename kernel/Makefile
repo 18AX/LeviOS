@@ -9,6 +9,7 @@ TARGET=$(BUILDDIR)/levi
 .PHONY: all iso clean x86_64
 
 KERNEL_OBJ= kmain.c.o \
+	serial/serial.c.o \
 	panic.c.o \
 	boot/boot.c.o \
 	boot/stivale2.c.o \
