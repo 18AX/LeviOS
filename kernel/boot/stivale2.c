@@ -1,4 +1,4 @@
-#include "levi/stivale2.h"
+#include "levi/boot/stivale2.h"
 
 #include "levi/utils/stdio.h"
 #include "levi/utils/string.h"
