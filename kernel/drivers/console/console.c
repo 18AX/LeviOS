@@ -3,7 +3,6 @@
 #include <levi/fs/file.h>
 #include <levi/fs/fs.h>
 #include <levi/memory/memory.h>
-#include <levi/utils/list.h>
 #include <levi/utils/string.h>
 
 #define LINE_HEIGH 15

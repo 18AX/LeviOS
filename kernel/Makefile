@@ -12,7 +12,7 @@ KERNEL_OBJ= kmain.c.o \
 	panic.c.o \
 	boot/stivale2.c.o \
 	utils/string.c.o \
-	utils/list.c.o \
+	utils/linked_list.c.o \
 	utils/kprintf.c.o \
 	utils/kerr.c.o \
 	utils/queue.c.o \

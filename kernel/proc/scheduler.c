@@ -2,11 +2,11 @@
 #include <levi/interrupts/interrupts.h>
 #include <levi/proc/scheduler.h>
 #include <levi/time/time.h>
-#include <levi/utils/list.h>
+#include <levi/utils/linked_list.h>
 
-static struct list_element *current = NULL;
+static struct linked_list_elt *current = NULL;
 
-static list_t *processes = NULL;
+static linked_list_t *processes = NULL;
 static u64 to_count = 0;
 
 void sched_schedule()
@@ -31,7 +31,7 @@ void sched_schedule()
 
 STATUS sched_init()
 {
-    processes = list_create();
+    processes = linked_list_new(NULL);
 
     if (processes == NULL)
     {
@@ -43,7 +43,7 @@ STATUS sched_init()
 
 STATUS sched_add(u64 id)
 {
-    list_add(processes, (void *)id);
+    linked_list_add(processes, (void *)id);
 
     if (current == NULL)
     {
@@ -54,7 +54,7 @@ STATUS sched_add(u64 id)
 
 void sched_remove(u64 id)
 {
-    list_remove_all(processes, (void *)id);
+    linked_list_remove_ptr(processes, (void *)id);
 }
 
 u64 sched_get(void)
@@ -64,5 +64,5 @@ u64 sched_get(void)
         return -1;
     }
 
-    return (u64)current->data;
+    return (u64)current->value;
 }
