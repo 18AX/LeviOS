@@ -173,8 +173,8 @@ static int print_hex_ll(char *buf, int max, unsigned long long value)
 }
 
 /** copy string into result, reversed */
-static void spool_str_rev(char **at, u32 *left, u64 *ret, const char *buf,
-                          int len)
+static void
+spool_str_rev(char **at, u32 *left, u64 *ret, const char *buf, int len)
 {
     int i = len;
     while (i)
@@ -206,9 +206,20 @@ static void spool_str(char **at, u32 *left, u64 *ret, const char *buf, int len)
 }
 
 /** print number formatted */
-static void print_num(char **at, u32 *left, u64 *ret, int minw, int precision,
-                      int prgiven, int zeropad, int minus, int plus, int space,
-                      int zero, int negative, char *buf, int len)
+static void print_num(char **at,
+                      u32 *left,
+                      u64 *ret,
+                      int minw,
+                      int precision,
+                      int prgiven,
+                      int zeropad,
+                      int minus,
+                      int plus,
+                      int space,
+                      int zero,
+                      int negative,
+                      char *buf,
+                      int len)
 {
     int w = len; /* excludes minus sign */
     char s = get_negsign(negative, plus, space);
@@ -277,131 +288,317 @@ static void print_num(char **at, u32 *left, u64 *ret, int minw, int precision,
 }
 
 /** print %d and %i */
-static void print_num_d(char **at, u32 *left, u64 *ret, int value, int minw,
-                        int precision, int prgiven, int zeropad, int minus,
-                        int plus, int space)
+static void print_num_d(char **at,
+                        u32 *left,
+                        u64 *ret,
+                        int value,
+                        int minw,
+                        int precision,
+                        int prgiven,
+                        int zeropad,
+                        int minus,
+                        int plus,
+                        int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = (value < 0);
     int zero = (value == 0);
-    int len = print_dec(buf, (int)sizeof(buf),
-                        (unsigned int)(negative ? -value : value));
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    int len = print_dec(
+        buf, (int)sizeof(buf), (unsigned int)(negative ? -value : value));
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %ld and %li */
-static void print_num_ld(char **at, u32 *left, u64 *ret, long value, int minw,
-                         int precision, int prgiven, int zeropad, int minus,
-                         int plus, int space)
+static void print_num_ld(char **at,
+                         u32 *left,
+                         u64 *ret,
+                         long value,
+                         int minw,
+                         int precision,
+                         int prgiven,
+                         int zeropad,
+                         int minus,
+                         int plus,
+                         int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = (value < 0);
     int zero = (value == 0);
-    int len = print_dec_l(buf, (int)sizeof(buf),
-                          (unsigned long)(negative ? -value : value));
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    int len = print_dec_l(
+        buf, (int)sizeof(buf), (unsigned long)(negative ? -value : value));
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %lld and %lli */
-static void print_num_lld(char **at, u32 *left, u64 *ret, long long value,
-                          int minw, int precision, int prgiven, int zeropad,
-                          int minus, int plus, int space)
+static void print_num_lld(char **at,
+                          u32 *left,
+                          u64 *ret,
+                          long long value,
+                          int minw,
+                          int precision,
+                          int prgiven,
+                          int zeropad,
+                          int minus,
+                          int plus,
+                          int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = (value < 0);
     int zero = (value == 0);
-    int len = print_dec_ll(buf, (int)sizeof(buf),
-                           (unsigned long long)(negative ? -value : value));
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    int len = print_dec_ll(
+        buf, (int)sizeof(buf), (unsigned long long)(negative ? -value : value));
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %u */
-static void print_num_u(char **at, u32 *left, u64 *ret, unsigned int value,
-                        int minw, int precision, int prgiven, int zeropad,
-                        int minus, int plus, int space)
+static void print_num_u(char **at,
+                        u32 *left,
+                        u64 *ret,
+                        unsigned int value,
+                        int minw,
+                        int precision,
+                        int prgiven,
+                        int zeropad,
+                        int minus,
+                        int plus,
+                        int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_dec(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %lu */
-static void print_num_lu(char **at, u32 *left, u64 *ret, unsigned long value,
-                         int minw, int precision, int prgiven, int zeropad,
-                         int minus, int plus, int space)
+static void print_num_lu(char **at,
+                         u32 *left,
+                         u64 *ret,
+                         unsigned long value,
+                         int minw,
+                         int precision,
+                         int prgiven,
+                         int zeropad,
+                         int minus,
+                         int plus,
+                         int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_dec_l(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %llu */
-static void print_num_llu(char **at, u32 *left, u64 *ret,
-                          unsigned long long value, int minw, int precision,
-                          int prgiven, int zeropad, int minus, int plus,
+static void print_num_llu(char **at,
+                          u32 *left,
+                          u64 *ret,
+                          unsigned long long value,
+                          int minw,
+                          int precision,
+                          int prgiven,
+                          int zeropad,
+                          int minus,
+                          int plus,
                           int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_dec_ll(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %x */
-static void print_num_x(char **at, u32 *left, u64 *ret, unsigned int value,
-                        int minw, int precision, int prgiven, int zeropad,
-                        int minus, int plus, int space)
+static void print_num_x(char **at,
+                        u32 *left,
+                        u64 *ret,
+                        unsigned int value,
+                        int minw,
+                        int precision,
+                        int prgiven,
+                        int zeropad,
+                        int minus,
+                        int plus,
+                        int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_hex(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %lx */
-static void print_num_lx(char **at, u32 *left, u64 *ret, unsigned long value,
-                         int minw, int precision, int prgiven, int zeropad,
-                         int minus, int plus, int space)
+static void print_num_lx(char **at,
+                         u32 *left,
+                         u64 *ret,
+                         unsigned long value,
+                         int minw,
+                         int precision,
+                         int prgiven,
+                         int zeropad,
+                         int minus,
+                         int plus,
+                         int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_hex_l(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %llx */
-static void print_num_llx(char **at, u32 *left, u64 *ret,
-                          unsigned long long value, int minw, int precision,
-                          int prgiven, int zeropad, int minus, int plus,
+static void print_num_llx(char **at,
+                          u32 *left,
+                          u64 *ret,
+                          unsigned long long value,
+                          int minw,
+                          int precision,
+                          int prgiven,
+                          int zeropad,
+                          int minus,
+                          int plus,
                           int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
     int zero = (value == 0);
     int len = print_hex_ll(buf, (int)sizeof(buf), value);
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** print %llp */
-static void print_num_llp(char **at, u32 *left, u64 *ret, void *value, int minw,
-                          int precision, int prgiven, int zeropad, int minus,
-                          int plus, int space)
+static void print_num_llp(char **at,
+                          u32 *left,
+                          u64 *ret,
+                          void *value,
+                          int minw,
+                          int precision,
+                          int prgiven,
+                          int zeropad,
+                          int minus,
+                          int plus,
+                          int space)
 {
     char buf[PRINT_DEC_BUFSZ];
     int negative = 0;
@@ -430,8 +627,20 @@ static void print_num_llp(char **at, u32 *left, u64 *ret, void *value, int minw,
         if (len < PRINT_DEC_BUFSZ)
             buf[len++] = '0';
     }
-    print_num(at, left, ret, minw, precision, prgiven, zeropad, minus, plus,
-              space, zero, negative, buf, len);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              precision,
+              prgiven,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 #define PRINT_FLOAT_BUFSZ 64 /* xx.yy with 20.20 about the max */
@@ -488,9 +697,17 @@ static int print_float(char *buf, int max, double value, int prec)
 }
 
 /** print %f */
-static void print_num_f(char **at, u32 *left, u64 *ret, double value, int minw,
-                        int precision, int prgiven, int zeropad, int minus,
-                        int plus, int space)
+static void print_num_f(char **at,
+                        u32 *left,
+                        u64 *ret,
+                        double value,
+                        int minw,
+                        int precision,
+                        int prgiven,
+                        int zeropad,
+                        int minus,
+                        int plus,
+                        int space)
 {
     char buf[PRINT_FLOAT_BUFSZ];
     int negative = (value < 0);
@@ -498,10 +715,22 @@ static void print_num_f(char **at, u32 *left, u64 *ret, double value, int minw,
     int len;
     if (!prgiven)
         precision = 6;
-    len = print_float(buf, (int)sizeof(buf), negative ? -value : value,
-                      precision);
-    print_num(at, left, ret, minw, 1, 0, zeropad, minus, plus, space, zero,
-              negative, buf, len);
+    len = print_float(
+        buf, (int)sizeof(buf), negative ? -value : value, precision);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              1,
+              0,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /* rudimentary %g support */
@@ -534,9 +763,17 @@ static int print_float_g(char *buf, int max, double value, int prec)
 }
 
 /** print %g */
-static void print_num_g(char **at, u32 *left, u64 *ret, double value, int minw,
-                        int precision, int prgiven, int zeropad, int minus,
-                        int plus, int space)
+static void print_num_g(char **at,
+                        u32 *left,
+                        u64 *ret,
+                        double value,
+                        int minw,
+                        int precision,
+                        int prgiven,
+                        int zeropad,
+                        int minus,
+                        int plus,
+                        int space)
 {
     char buf[PRINT_FLOAT_BUFSZ];
     int negative = (value < 0);
@@ -546,10 +783,22 @@ static void print_num_g(char **at, u32 *left, u64 *ret, double value, int minw,
         precision = 6;
     if (precision == 0)
         precision = 1;
-    len = print_float_g(buf, (int)sizeof(buf), negative ? -value : value,
-                        precision);
-    print_num(at, left, ret, minw, 1, 0, zeropad, minus, plus, space, zero,
-              negative, buf, len);
+    len = print_float_g(
+        buf, (int)sizeof(buf), negative ? -value : value, precision);
+    print_num(at,
+              left,
+              ret,
+              minw,
+              1,
+              0,
+              zeropad,
+              minus,
+              plus,
+              space,
+              zero,
+              negative,
+              buf,
+              len);
 }
 
 /** strnlen (compat implementation) */
@@ -563,8 +812,14 @@ static int my_strnlen(const char *s, int max)
 }
 
 /** print %s */
-static void print_str(char **at, u32 *left, u64 *ret, char *s, int minw,
-                      int precision, int prgiven, int minus)
+static void print_str(char **at,
+                      u32 *left,
+                      u64 *ret,
+                      char *s,
+                      int minw,
+                      int precision,
+                      int prgiven,
+                      int minus)
 {
     int w;
     /* with prec: no more than x characters from this string, stop at 0 */
@@ -580,8 +835,8 @@ static void print_str(char **at, u32 *left, u64 *ret, char *s, int minw,
 }
 
 /** print %c */
-static void print_char(char **at, u32 *left, u64 *ret, int c, int minw,
-                       int minus)
+static void
+print_char(char **at, u32 *left, u64 *ret, int c, int minw, int minus)
 {
     if (1 < minw && !minus)
         print_pad(at, left, ret, ' ', minw - 1);
@@ -755,42 +1010,127 @@ u64 vsnprintf(char *str, u32 size, const char *format, va_list arg)
         case 'i':
         case 'd':
             if (length == 0)
-                print_num_d(&at, &left, &ret, va_arg(arg, int), minw, precision,
-                            prgiven, zeropad, minus, plus, space);
+                print_num_d(&at,
+                            &left,
+                            &ret,
+                            va_arg(arg, int),
+                            minw,
+                            precision,
+                            prgiven,
+                            zeropad,
+                            minus,
+                            plus,
+                            space);
             else if (length == 1)
-                print_num_ld(&at, &left, &ret, va_arg(arg, long), minw,
-                             precision, prgiven, zeropad, minus, plus, space);
+                print_num_ld(&at,
+                             &left,
+                             &ret,
+                             va_arg(arg, long),
+                             minw,
+                             precision,
+                             prgiven,
+                             zeropad,
+                             minus,
+                             plus,
+                             space);
             else if (length == 2)
-                print_num_lld(&at, &left, &ret, va_arg(arg, long long), minw,
-                              precision, prgiven, zeropad, minus, plus, space);
+                print_num_lld(&at,
+                              &left,
+                              &ret,
+                              va_arg(arg, long long),
+                              minw,
+                              precision,
+                              prgiven,
+                              zeropad,
+                              minus,
+                              plus,
+                              space);
             break;
         case 'u':
             if (length == 0)
-                print_num_u(&at, &left, &ret, va_arg(arg, unsigned int), minw,
-                            precision, prgiven, zeropad, minus, plus, space);
+                print_num_u(&at,
+                            &left,
+                            &ret,
+                            va_arg(arg, unsigned int),
+                            minw,
+                            precision,
+                            prgiven,
+                            zeropad,
+                            minus,
+                            plus,
+                            space);
             else if (length == 1)
-                print_num_lu(&at, &left, &ret, va_arg(arg, unsigned long), minw,
-                             precision, prgiven, zeropad, minus, plus, space);
+                print_num_lu(&at,
+                             &left,
+                             &ret,
+                             va_arg(arg, unsigned long),
+                             minw,
+                             precision,
+                             prgiven,
+                             zeropad,
+                             minus,
+                             plus,
+                             space);
             else if (length == 2)
-                print_num_llu(&at, &left, &ret, va_arg(arg, unsigned long long),
-                              minw, precision, prgiven, zeropad, minus, plus,
+                print_num_llu(&at,
+                              &left,
+                              &ret,
+                              va_arg(arg, unsigned long long),
+                              minw,
+                              precision,
+                              prgiven,
+                              zeropad,
+                              minus,
+                              plus,
                               space);
             break;
         case 'x':
             if (length == 0)
-                print_num_x(&at, &left, &ret, va_arg(arg, unsigned int), minw,
-                            precision, prgiven, zeropad, minus, plus, space);
+                print_num_x(&at,
+                            &left,
+                            &ret,
+                            va_arg(arg, unsigned int),
+                            minw,
+                            precision,
+                            prgiven,
+                            zeropad,
+                            minus,
+                            plus,
+                            space);
             else if (length == 1)
-                print_num_lx(&at, &left, &ret, va_arg(arg, unsigned long), minw,
-                             precision, prgiven, zeropad, minus, plus, space);
+                print_num_lx(&at,
+                             &left,
+                             &ret,
+                             va_arg(arg, unsigned long),
+                             minw,
+                             precision,
+                             prgiven,
+                             zeropad,
+                             minus,
+                             plus,
+                             space);
             else if (length == 2)
-                print_num_llx(&at, &left, &ret, va_arg(arg, unsigned long long),
-                              minw, precision, prgiven, zeropad, minus, plus,
+                print_num_llx(&at,
+                              &left,
+                              &ret,
+                              va_arg(arg, unsigned long long),
+                              minw,
+                              precision,
+                              prgiven,
+                              zeropad,
+                              minus,
+                              plus,
                               space);
             break;
         case 's':
-            print_str(&at, &left, &ret, va_arg(arg, char *), minw, precision,
-                      prgiven, minus);
+            print_str(&at,
+                      &left,
+                      &ret,
+                      va_arg(arg, char *),
+                      minw,
+                      precision,
+                      prgiven,
+                      minus);
             break;
         case 'c':
             print_char(&at, &left, &ret, va_arg(arg, int), minw, minus);
@@ -799,19 +1139,46 @@ u64 vsnprintf(char *str, u32 size, const char *format, va_list arg)
             *va_arg(arg, int *) = ret;
             break;
         case 'p':
-            print_num_llp(&at, &left, &ret, va_arg(arg, void *), minw,
-                          precision, prgiven, zeropad, minus, plus, space);
+            print_num_llp(&at,
+                          &left,
+                          &ret,
+                          va_arg(arg, void *),
+                          minw,
+                          precision,
+                          prgiven,
+                          zeropad,
+                          minus,
+                          plus,
+                          space);
             break;
         case '%':
             print_pad(&at, &left, &ret, '%', 1);
             break;
         case 'f':
-            print_num_f(&at, &left, &ret, va_arg(arg, double), minw, precision,
-                        prgiven, zeropad, minus, plus, space);
+            print_num_f(&at,
+                        &left,
+                        &ret,
+                        va_arg(arg, double),
+                        minw,
+                        precision,
+                        prgiven,
+                        zeropad,
+                        minus,
+                        plus,
+                        space);
             break;
         case 'g':
-            print_num_g(&at, &left, &ret, va_arg(arg, double), minw, precision,
-                        prgiven, zeropad, minus, plus, space);
+            print_num_g(&at,
+                        &left,
+                        &ret,
+                        va_arg(arg, double),
+                        minw,
+                        precision,
+                        prgiven,
+                        zeropad,
+                        minus,
+                        plus,
+                        space);
             break;
         /* unknown */
         default:

@@ -25,10 +25,17 @@
 
 #define SYSCALL_FAILED 0xFFFFFFFFFFFFFFFF
 
-typedef u64 (*syscall_handler_t)(proc_t *proc, u64 args0, u64 args1, u64 args2,
+typedef u64 (*syscall_handler_t)(proc_t *proc,
+                                 u64 args0,
+                                 u64 args1,
+                                 u64 args2,
                                  u64 args3);
 
-u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
+u64 syscall(proc_t *proc,
+            u64 syscall_id,
+            u64 args0,
+            u64 args1,
+            u64 args2,
             u64 args3);
 
 STATUS syscall_init(void);

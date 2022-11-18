@@ -19,7 +19,9 @@
  */
 u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3);
 
-u64 kexec(const char *path, const char *proc_name, const char *argv[],
+u64 kexec(const char *path,
+          const char *proc_name,
+          const char *argv[],
           const char *envp[]);
 
 #endif

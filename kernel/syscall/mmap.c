@@ -41,8 +41,8 @@ u64 sys_mmap(proc_t *proc, u64 base_address, u64 nb_page, u64 flag, u64 unused)
         virt = proc->end_code + phys;
     }
 
-    if (vmmap_range(&proc->vas, phys, virt, PAGE_SIZE * nb_page,
-                    get_vmmap_flag(flag))
+    if (vmmap_range(
+            &proc->vas, phys, virt, PAGE_SIZE * nb_page, get_vmmap_flag(flag))
         == MAP_FAILED)
     {
         kframe_free((void *)ptr, nb_page);

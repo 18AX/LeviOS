@@ -26,7 +26,11 @@ static syscall_handler_t syscall_handlers[SYSCALL_NBR] = {
     [SYSCALL_GETTICKS] = sys_getticks, [SYSCALL_FDFUNC] = sys_fdfunc
 };
 
-u64 syscall(proc_t *proc, u64 syscall_id, u64 args0, u64 args1, u64 args2,
+u64 syscall(proc_t *proc,
+            u64 syscall_id,
+            u64 args0,
+            u64 args1,
+            u64 args2,
             u64 args3)
 {
     if (syscall_id >= SYSCALL_NBR)

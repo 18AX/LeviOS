@@ -2,7 +2,10 @@
 #include <levi/syscall/gettime.h>
 #include <levi/syscall/syscall.h>
 
-u64 sys_gettime(proc_t *proc, u64 address, u64 unused1, u64 unused2,
+u64 sys_gettime(proc_t *proc,
+                u64 address,
+                u64 unused1,
+                u64 unused2,
                 u64 unused3)
 {
     (void)unused1;

@@ -15,8 +15,11 @@ static u64 sys_exec(u64 sys_id, u64 arg0, u64 arg1, u64 arg2, u64 arg3)
                  "int $0x80\n"
                  "movq %%rax,%[retv]\n"
                  : [retv] "=r"(ret)
-                 : [a0] "r"(arg0), [a1] "r"(arg1), [a2] "r"(arg2),
-                   [a3] "r"(arg3), [id] "r"(sys_id)
+                 : [a0] "r"(arg0),
+                   [a1] "r"(arg1),
+                   [a2] "r"(arg2),
+                   [a3] "r"(arg3),
+                   [id] "r"(sys_id)
                  : "rdi", "rsi", "rdx", "r10", "rax");
 
     return ret;
@@ -107,7 +110,9 @@ s32 dup2(s32 oldfd, s32 newfd)
     return ret;
 }
 
-s64 exec(const char *path, const char *name, const char *argv[],
+s64 exec(const char *path,
+         const char *name,
+         const char *argv[],
          const char *envp[])
 {
     u64 ret =

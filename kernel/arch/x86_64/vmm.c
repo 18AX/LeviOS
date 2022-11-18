@@ -50,8 +50,8 @@ STATUS fill_empty_vas(vas_t *vas)
     return SUCCESS;
 }
 
-static struct pml_entry *find_or_allocate_pml(struct pml_entry *pml, u64 idx,
-                                              u64 flags)
+static struct pml_entry *
+find_or_allocate_pml(struct pml_entry *pml, u64 idx, u64 flags)
 {
     if (pml[idx].present == 1)
     {

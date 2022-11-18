@@ -15,9 +15,11 @@ u32 module_init(struct stivale2_struct *boot_info)
 
     for (u32 i = 0; i < tag_module->module_count; ++i)
     {
-        if (memfile_create(
-                tag_module->modules[i].string, tag_module->modules[i].begin,
-                tag_module->modules[i].end - tag_module->modules[i].begin, 0x0)
+        if (memfile_create(tag_module->modules[i].string,
+                           tag_module->modules[i].begin,
+                           tag_module->modules[i].end
+                               - tag_module->modules[i].begin,
+                           0x0)
             == SUCCESS)
         {
             ++modules_loaded;

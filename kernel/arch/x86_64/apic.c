@@ -59,7 +59,8 @@ STATUS apic_init()
 
     /** We init with 0xFF to make the difference between irq that are override
      * or not **/
-    memset(interrupts_override, 0xFF,
+    memset(interrupts_override,
+           0xFF,
            sizeof(struct madt_ioapic_interrupt_override)
                * IO_REDIRECTION_TABLE_SIZE);
 
@@ -87,7 +88,8 @@ STATUS apic_init()
 
             if (lapic_cpus_count + 1 < LOCAL_APIC_MAX_CPU)
             {
-                memcpy(&lapic_cpus[lapic_cpus_count++], s,
+                memcpy(&lapic_cpus[lapic_cpus_count++],
+                       s,
                        sizeof(struct madt_lapic_proc));
             }
             break;
@@ -96,7 +98,8 @@ STATUS apic_init()
             struct madt_ioapic_interrupt_override *s =
                 (struct madt_ioapic_interrupt_override *)record;
 
-            memcpy(&interrupts_override[s->irq_source], s,
+            memcpy(&interrupts_override[s->irq_source],
+                   s,
                    sizeof(struct madt_ioapic_interrupt_override));
             break;
         }
@@ -125,8 +128,8 @@ STATUS apic_init()
 
     for (u64 i = 0; i < ioapic_max_redirections; ++i)
     {
-        ioapic_irq_set(0, i, 0,
-                       IOAPIC_INTERRUPT_MASK_SET | IOAPIC_TRIGGER_EDGE);
+        ioapic_irq_set(
+            0, i, 0, IOAPIC_INTERRUPT_MASK_SET | IOAPIC_TRIGGER_EDGE);
     }
 
     return SUCCESS;

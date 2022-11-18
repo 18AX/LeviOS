@@ -243,7 +243,10 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 #ifdef DEBUG
     term_print(
         "liballoc: Resource allocated %x of %i pages (%i bytes) for %i size.\n",
-        maj, st, maj->size, size);
+        maj,
+        st,
+        maj->size,
+        size);
 
     term_print("liballoc: Total memory usage = %i KB\n",
                (int)((l_allocated / (1024))));
@@ -317,7 +320,8 @@ void *PREFIX(malloc)(u64 req_size)
 
 #ifdef DEBUG
     term_print("liballoc: %x PREFIX(malloc)( %i ): ",
-               __builtin_return_address(0), size);
+               __builtin_return_address(0),
+               size);
     FLUSH();
 #endif
 
@@ -641,7 +645,8 @@ void PREFIX(free)(void *ptr)
             term_print(
                 "liballoc: ERROR: Possible 1-3 byte overrun for magic %x != "
                 "%x\n",
-                min->magic, LIBALLOC_MAGIC);
+                min->magic,
+                LIBALLOC_MAGIC);
             FLUSH();
 #endif
         }
@@ -651,7 +656,8 @@ void PREFIX(free)(void *ptr)
 #if defined DEBUG || defined INFO
             term_print("liballoc: ERROR: multiple PREFIX(free)() attempt on %x "
                        "from %x.\n",
-                       ptr, __builtin_return_address(0));
+                       ptr,
+                       __builtin_return_address(0));
             FLUSH();
 #endif
         }
@@ -659,7 +665,8 @@ void PREFIX(free)(void *ptr)
         {
 #if defined DEBUG || defined INFO
             term_print(
-                "liballoc: ERROR: Bad PREFIX(free)( %x ) called from %x\n", ptr,
+                "liballoc: ERROR: Bad PREFIX(free)( %x ) called from %x\n",
+                ptr,
                 __builtin_return_address(0));
             FLUSH();
 #endif
@@ -671,8 +678,8 @@ void PREFIX(free)(void *ptr)
     }
 
 #ifdef DEBUG
-    term_print("liballoc: %x PREFIX(free)( %x ): ", __builtin_return_address(0),
-               ptr);
+    term_print(
+        "liballoc: %x PREFIX(free)( %x ): ", __builtin_return_address(0), ptr);
     FLUSH();
 #endif
 
@@ -784,7 +791,8 @@ void *PREFIX(realloc)(void *p, u64 size)
             term_print(
                 "liballoc: ERROR: Possible 1-3 byte overrun for magic %x != "
                 "%x\n",
-                min->magic, LIBALLOC_MAGIC);
+                min->magic,
+                LIBALLOC_MAGIC);
             FLUSH();
 #endif
         }
@@ -794,7 +802,8 @@ void *PREFIX(realloc)(void *p, u64 size)
 #if defined DEBUG || defined INFO
             term_print("liballoc: ERROR: multiple PREFIX(free)() attempt on %x "
                        "from %x.\n",
-                       ptr, __builtin_return_address(0));
+                       ptr,
+                       __builtin_return_address(0));
             FLUSH();
 #endif
         }
@@ -802,7 +811,8 @@ void *PREFIX(realloc)(void *p, u64 size)
         {
 #if defined DEBUG || defined INFO
             term_print(
-                "liballoc: ERROR: Bad PREFIX(free)( %x ) called from %x\n", ptr,
+                "liballoc: ERROR: Bad PREFIX(free)( %x ) called from %x\n",
+                ptr,
                 __builtin_return_address(0));
             FLUSH();
 #endif

@@ -44,7 +44,9 @@ s64 lseek(s32 fd, u64 offset, u32 whence);
 
 s32 dup2(s32 oldfd, s32 newfd);
 
-s64 exec(const char *path, const char *name, const char *argv[],
+s64 exec(const char *path,
+         const char *name,
+         const char *argv[],
          const char *envp[]);
 
 s64 exit(s64 exit_status);

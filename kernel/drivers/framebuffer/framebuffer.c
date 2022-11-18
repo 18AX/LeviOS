@@ -42,7 +42,8 @@ STATUS framebuffer_init(struct stivale2_struct *boot_info)
         return FAILED;
     }
 
-    memcpy(&framebuffer_info, framebuffer_tag,
+    memcpy(&framebuffer_info,
+           framebuffer_tag,
            sizeof(struct stivale2_struct_tag_framebuffer));
 
     buffer_size = framebuffer_info.framebuffer_width
@@ -176,8 +177,8 @@ static s32 __flush(file_t *file)
 {
     (void)file;
 
-    memcpy((void *)framebuffer_info.framebuffer_addr, video_buffer,
-           buffer_size);
+    memcpy(
+        (void *)framebuffer_info.framebuffer_addr, video_buffer, buffer_size);
 
     return 0;
 }

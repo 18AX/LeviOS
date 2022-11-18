@@ -52,8 +52,8 @@ static const char exceptions_message[32][32] = {
     "Reserved"
 };
 
-static void set_entry(u32 index, u64 address, u16 selector, u8 ist,
-                      u8 type_attr)
+static void
+set_entry(u32 index, u64 address, u16 selector, u8 ist, u8 type_attr)
 {
     idt_entries[index].offset_1 = address & 0xFFFF;
     idt_entries[index].offset_2 = (address >> 16) & 0xFFFF;
@@ -87,18 +87,26 @@ static void handle_exception(u64 index, u64 error_code, proc_t *proc)
         if (vma_to_phys(&curr_vas, cr2, &phys_addrr) == MAP_FAILED)
         {
             kerr(KERROR_VIRTUAL_MEMORY,
-                 "error code %lx Page not present cr2: %lx\n", error_code, cr2);
+                 "error code %lx Page not present cr2: %lx\n",
+                 error_code,
+                 cr2);
         }
         else
         {
-            kerr(KERROR_VIRTUAL_MEMORY, "error code %lx %lx -> %lx\n",
-                 error_code, cr2, phys_addrr);
+            kerr(KERROR_VIRTUAL_MEMORY,
+                 "error code %lx %lx -> %lx\n",
+                 error_code,
+                 cr2,
+                 phys_addrr);
         }
         break;
     }
     default:
-        kerr(KERROR_UNEXPECTED_INTERRUPTION, "%s\nindex %lx error code %lx\n",
-             exceptions_message[index], index, error_code);
+        kerr(KERROR_UNEXPECTED_INTERRUPTION,
+             "%s\nindex %lx error code %lx\n",
+             exceptions_message[index],
+             index,
+             error_code);
         break;
     }
 
@@ -449,7 +457,10 @@ void idt_init()
     set_entry(45, (u64)isr_45, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(46, (u64)isr_46, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(47, (u64)isr_47, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
-    set_entry(48, (u64)isr_48, SEGMENT_SELECTOR(1, 0, 0), 0,
+    set_entry(48,
+              (u64)isr_48,
+              SEGMENT_SELECTOR(1, 0, 0),
+              0,
               INTERRUPT_GATE | ALLOW_TO_USER);
     set_entry(49, (u64)isr_49, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(50, (u64)isr_50, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
@@ -530,7 +541,10 @@ void idt_init()
     set_entry(125, (u64)isr_125, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(126, (u64)isr_126, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(127, (u64)isr_127, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
-    set_entry(128, (u64)isr_128, SEGMENT_SELECTOR(1, 0, 0), 0,
+    set_entry(128,
+              (u64)isr_128,
+              SEGMENT_SELECTOR(1, 0, 0),
+              0,
               INTERRUPT_GATE | ALLOW_TO_USER); // Gate used for syscall
     set_entry(129, (u64)isr_129, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);
     set_entry(130, (u64)isr_130, SEGMENT_SELECTOR(1, 0, 0), 0, INTERRUPT_GATE);

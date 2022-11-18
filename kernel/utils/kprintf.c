@@ -32,8 +32,8 @@ static int skip_atoi(const char **s)
         __res;                                                                 \
     })
 
-static char *number(char *str, long num, int base, int size, int precision,
-                    int type)
+static char *
+number(char *str, long num, int base, int size, int precision, int type)
 {
     /* we are called with base 8, 10 or 16, only, thus don't need "G..."  */
     static const char digits[16] =
@@ -234,8 +234,12 @@ int kvsprintf(char *buf, const char *fmt, va_list args)
                 field_width = 2 * sizeof(void *);
                 flags |= ZEROPAD;
             }
-            str = number(str, (unsigned long)va_arg(args, void *), 16,
-                         field_width, precision, flags);
+            str = number(str,
+                         (unsigned long)va_arg(args, void *),
+                         16,
+                         field_width,
+                         precision,
+                         flags);
             continue;
 
         case 'n':

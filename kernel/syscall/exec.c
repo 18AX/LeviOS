@@ -95,8 +95,11 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
             flags |= VM_READ_WRITE;
         }
 
-        if (vmmap_range(&n_proc->vas, hhdm_to_phys(addr), phdr.p_vaddr,
-                        phdr.p_memsz, flags)
+        if (vmmap_range(&n_proc->vas,
+                        hhdm_to_phys(addr),
+                        phdr.p_vaddr,
+                        phdr.p_memsz,
+                        flags)
             == MAP_FAILED)
         {
             kframe_free((void *)addr, nb_page);
@@ -130,7 +133,8 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
         return SYSCALL_FAILED;
     }
 
-    arch_ctx_init(&n_proc->ctx, (void *)header.e_entry,
+    arch_ctx_init(&n_proc->ctx,
+                  (void *)header.e_entry,
                   (void *)(USER_STACK_ADDRESS + PAGE_SIZE * USER_STACK_PAGE_NB),
                   0);
 
@@ -140,7 +144,9 @@ u64 sys_exec(proc_t *proc, u64 args0, u64 args1, u64 args2, u64 args3)
     return n_proc->id;
 }
 
-u64 kexec(const char *path, const char *proc_name, const char *argv[],
+u64 kexec(const char *path,
+          const char *proc_name,
+          const char *argv[],
           const char *envp[])
 {
     proc_t *kernel_proc = proc_get(0);

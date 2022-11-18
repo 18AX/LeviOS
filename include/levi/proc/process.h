@@ -23,7 +23,7 @@ typedef struct process
     context_t ctx;
 } proc_t;
 
-proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags);
+proc_t *proc_create(const char *name, u32 flags);
 
 /**
  * @brief Allocate n pages for the stack process.
@@ -35,7 +35,7 @@ proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags);
  */
 STATUS proc_allocate_stack(proc_t *proc, u64 address, u64 nb_page);
 
-proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas);
+proc_t *proc_kernel(const char *name, vas_t *vas);
 
 void proc_destroy(proc_t *proc);
 

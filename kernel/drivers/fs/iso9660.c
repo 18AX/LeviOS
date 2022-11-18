@@ -119,11 +119,13 @@ static s64 find_next(char *str, char c)
  * @param identifier_len
  * @return u64
  */
-static u64 iso_filename_eq(const char *filename, const char *identifier,
+static u64 iso_filename_eq(const char *filename,
+                           const char *identifier,
                            u64 identifier_len)
 {
     for (u64 i = 0;
-         i < identifier_len && identifier[i] != ';' && filename[i] != '\0'; ++i)
+         i < identifier_len && identifier[i] != ';' && filename[i] != '\0';
+         ++i)
     {
         if (filename[i] != identifier[i])
         {
@@ -199,8 +201,10 @@ static struct iso_directory *find_file_in_dir(u32 fd, char *filename, u32 blk)
  * @return struct iso_pathtable*
  */
 static struct iso_pathtable *pt_find_next(struct iso_pathtable *pathtable,
-                                          u16 parent, const char *dir_name,
-                                          u8 *limit_address, u16 *saved_id)
+                                          u16 parent,
+                                          const char *dir_name,
+                                          u8 *limit_address,
+                                          u16 *saved_id)
 {
     u8 *current = (u8 *)pathtable;
 
@@ -237,8 +241,10 @@ static struct iso_pathtable *pt_find_next(struct iso_pathtable *pathtable,
  * @param name
  * @return struct iso_directory*
  */
-static struct iso_directory *find_file(u32 fd, struct iso_pathtable *pathtable,
-                                       u32 pathtable_size, const char *name)
+static struct iso_directory *find_file(u32 fd,
+                                       struct iso_pathtable *pathtable,
+                                       u32 pathtable_size,
+                                       const char *name)
 {
     char *filename = strdup(name);
 

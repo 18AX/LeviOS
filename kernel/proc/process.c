@@ -5,7 +5,7 @@
 
 static proc_t *proc_list[MAX_PROCESS] = { NULL };
 
-proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas)
+proc_t *proc_kernel(const char *name, vas_t *vas)
 {
     proc_t *proc = kmalloc(sizeof(proc_t));
 
@@ -32,7 +32,7 @@ proc_t *proc_kernel(const char name[PROCESS_NAME_LEN], vas_t *vas)
     return proc;
 }
 
-proc_t *proc_create(const char name[PROCESS_NAME_LEN], u32 flags)
+proc_t *proc_create(const char *name, u32 flags)
 {
     proc_t *proc = kmalloc(sizeof(proc_t));
 

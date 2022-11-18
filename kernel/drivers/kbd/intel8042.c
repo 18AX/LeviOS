@@ -138,8 +138,8 @@ STATUS intel8042_init()
         return FAILED;
     }
 
-    if (ioapic_irq_set(0, 1, INTEL8042_IRQ,
-                       IOAPIC_TRIGGER_HIGH | IOAPIC_TRIGGER_EDGE)
+    if (ioapic_irq_set(
+            0, 1, INTEL8042_IRQ, IOAPIC_TRIGGER_HIGH | IOAPIC_TRIGGER_EDGE)
         == FAILED)
     {
         return FAILED;
